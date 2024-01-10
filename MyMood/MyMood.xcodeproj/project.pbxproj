@@ -10,6 +10,11 @@
 		D32BBD8D2B28BBEC00302EA8 /* EntryListFeature in Frameworks */ = {isa = PBXBuildFile; productRef = D32BBD8C2B28BBEC00302EA8 /* EntryListFeature */; };
 		D32BBD8F2B28D64E00302EA8 /* UIComponents in Frameworks */ = {isa = PBXBuildFile; productRef = D32BBD8E2B28D64E00302EA8 /* UIComponents */; };
 		D32BBD912B2903C100302EA8 /* RootFeature in Frameworks */ = {isa = PBXBuildFile; productRef = D32BBD902B2903C100302EA8 /* RootFeature */; };
+		D32BBD932B31E7CB00302EA8 /* MoodEntryFeature in Frameworks */ = {isa = PBXBuildFile; productRef = D32BBD922B31E7CB00302EA8 /* MoodEntryFeature */; };
+		D32BBD972B32042500302EA8 /* ColorGeneratorClient in Frameworks */ = {isa = PBXBuildFile; productRef = D32BBD962B32042500302EA8 /* ColorGeneratorClient */; };
+		D345D2692B45DF8600DB5062 /* FormattersClient in Frameworks */ = {isa = PBXBuildFile; productRef = D345D2682B45DF8600DB5062 /* FormattersClient */; };
+		D355E8482B4C99BD009EE87A /* LocationClient in Frameworks */ = {isa = PBXBuildFile; productRef = D355E8472B4C99BD009EE87A /* LocationClient */; };
+		D3E9F17B2B4D9CDF0057A3B5 /* WeatherClient in Frameworks */ = {isa = PBXBuildFile; productRef = D3E9F17A2B4D9CDF0057A3B5 /* WeatherClient */; };
 		D3F0CACE2B2223B600D55CB3 /* MyMoodApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F0CACD2B2223B600D55CB3 /* MyMoodApp.swift */; };
 		D3F0CAD02B2223B600D55CB3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F0CACF2B2223B600D55CB3 /* ContentView.swift */; };
 		D3F0CAD22B2223B700D55CB3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D3F0CAD12B2223B700D55CB3 /* Assets.xcassets */; };
@@ -58,10 +63,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				D32BBD8F2B28D64E00302EA8 /* UIComponents in Frameworks */,
+				D32BBD932B31E7CB00302EA8 /* MoodEntryFeature in Frameworks */,
+				D3E9F17B2B4D9CDF0057A3B5 /* WeatherClient in Frameworks */,
 				D3F0CAFD2B278F0A00D55CB3 /* Models in Frameworks */,
 				D3F0CAFB2B2254C900D55CB3 /* Theme in Frameworks */,
 				D32BBD8D2B28BBEC00302EA8 /* EntryListFeature in Frameworks */,
 				D32BBD912B2903C100302EA8 /* RootFeature in Frameworks */,
+				D355E8482B4C99BD009EE87A /* LocationClient in Frameworks */,
+				D345D2692B45DF8600DB5062 /* FormattersClient in Frameworks */,
+				D32BBD972B32042500302EA8 /* ColorGeneratorClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,6 +179,11 @@
 				D32BBD8C2B28BBEC00302EA8 /* EntryListFeature */,
 				D32BBD8E2B28D64E00302EA8 /* UIComponents */,
 				D32BBD902B2903C100302EA8 /* RootFeature */,
+				D32BBD922B31E7CB00302EA8 /* MoodEntryFeature */,
+				D32BBD962B32042500302EA8 /* ColorGeneratorClient */,
+				D345D2682B45DF8600DB5062 /* FormattersClient */,
+				D355E8472B4C99BD009EE87A /* LocationClient */,
+				D3E9F17A2B4D9CDF0057A3B5 /* WeatherClient */,
 			);
 			productName = MyMood;
 			productReference = D3F0CACA2B2223B600D55CB3 /* MyMood.app */;
@@ -452,6 +467,7 @@
 				DEVELOPMENT_TEAM = JSJFELMQF5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "To fetch weather near you";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -468,6 +484,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -484,6 +501,7 @@
 				DEVELOPMENT_TEAM = JSJFELMQF5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "To fetch weather near you";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -500,6 +518,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -634,6 +653,26 @@
 		D32BBD902B2903C100302EA8 /* RootFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RootFeature;
+		};
+		D32BBD922B31E7CB00302EA8 /* MoodEntryFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MoodEntryFeature;
+		};
+		D32BBD962B32042500302EA8 /* ColorGeneratorClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ColorGeneratorClient;
+		};
+		D345D2682B45DF8600DB5062 /* FormattersClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FormattersClient;
+		};
+		D355E8472B4C99BD009EE87A /* LocationClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LocationClient;
+		};
+		D3E9F17A2B4D9CDF0057A3B5 /* WeatherClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WeatherClient;
 		};
 		D3F0CAFA2B2254C900D55CB3 /* Theme */ = {
 			isa = XCSwiftPackageProductDependency;

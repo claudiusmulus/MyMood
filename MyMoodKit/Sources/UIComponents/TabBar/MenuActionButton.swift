@@ -84,7 +84,9 @@ struct MenuActionButton: View {
             .opacity(0.9)
             .ignoresSafeArea(edges: .top)
             .padding(.bottom, 50)
-            .opacity(isExpanded ? 1 : 0)
+            .animation(.smooth) {
+                $0.opacity(isExpanded ? 1 : 0)
+            }
     }
     
     @ViewBuilder
@@ -119,7 +121,9 @@ struct MenuActionButton: View {
     ) -> some View {
         Image(systemName: "plus")
             .foregroundStyle(.white)
-            .rotationEffect(isExpanded ? .degrees(45) : .degrees(0))
+            .animation(.bouncy, body: {
+                $0.rotationEffect(isExpanded ? .degrees(45) : .degrees(0))
+            })
             .font(.title.bold())
             .opacity(showIcon ? 1 : 0)
             .scaleEffect(showIcon ? 1 : 0)
@@ -128,7 +132,12 @@ struct MenuActionButton: View {
                 Circle()
                     .fill(backgroundColor)
                     .stroke(borderColor, lineWidth: 2)
-                    .shadow(color: .black.opacity(0.4), radius: 5)
+                    .animation(.smooth, body: {
+                        $0.shadow(
+                            color: .black.opacity(0.4),
+                            radius: isExpanded ? 0 : 5
+                        )
+                    })
             }
             .tag(0)
             .zIndex(100)
@@ -144,6 +153,7 @@ struct MenuActionButton: View {
     ) -> some View {
         VStack(spacing: 0) {
             secondaryActionButton(
+                tag: 0,
                 icon: "person",
                 text: "Action1",
                 showContent: isExpanded ? true : false,
@@ -154,6 +164,7 @@ struct MenuActionButton: View {
             emptyButton()
             
             secondaryActionButton(
+                tag: 1,
                 icon: "car",
                 text: "Action2",
                 showContent: isExpanded ? true : false,
@@ -168,20 +179,26 @@ struct MenuActionButton: View {
             RoundedRectangle(cornerRadius: 20)
         )
         .padding(.horizontal, 40)
-        .scaleEffect(isExpanded ? 1 : 0)
         .offset(y: isExpanded ? -80 : 40)
+        .scaleEffect(isExpanded ? 1 : 0)
         .tag(1)
     }
     
     @ViewBuilder
     private func secondaryActionButton(
+        tag: Int,
         icon: String,
         text: String,
         showContent: Bool,
         padding: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0),
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        Button(
+            action: {
+                self.onTap()
+                action()
+            }
+        ) {
             HStack(spacing: 20) {
                 Image(systemName: icon)
                     .font(.title2)
@@ -190,8 +207,14 @@ struct MenuActionButton: View {
             }
             .padding(padding)
             .frame(maxWidth: .infinity)
-            .opacity(showContent ? 1 : 0)
+            .animation(
+                .smooth(duration: 0.3)
+                .delay(showContent ? 0.2 + Double(tag)*0.05 : 0)
+            ) {
+                $0.opacity(showContent ? 1 : 0)
+            }
         }
+        .scaledButton()
     }
     
     @ViewBuilder
@@ -206,9 +229,7 @@ struct MenuActionButton: View {
     }
     
     private func onTap() {
-        withAnimation(
-            .interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.8)
-        ) {
+        withAnimation(.bouncy) {
             isExpanded.toggle()
         }
     }

@@ -12,7 +12,7 @@ extension Color {
 }
 
 extension Color {
-    public var rgba: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+    public var rgba: Color.Resolved {
         var red: CGFloat = 0
         var green: CGFloat = 0
         var blue: CGFloat = 0
@@ -20,7 +20,7 @@ extension Color {
         let uiColor = UIColor(self)
         uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
         
-        return (red, green, blue, alpha)
+        return Color.Resolved(red: Float(red), green: Float(green), blue: Float(blue), opacity: Float(alpha))
     }
 }
 

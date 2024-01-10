@@ -7,29 +7,34 @@
 
 import SwiftUI
 import Theme
+import MoodEntryFeature
+import ComposableArchitecture
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-            
-            Text(
-                "red: \(Color.moodRed.rgba.red), \ngreen: \(Color.moodRed.rgba.green), \nblue: \(Color.moodRed.rgba.blue)"
+//        MoodEntryRootView(
+//            store: Store(
+//                initialState: MoodEntryFeature.State(
+//                    moodEntry: .mockMeh()
+//                )
+//            ) {
+//                MoodEntryFeature()
+//            }
+//        )
+        MoodEntryRootView(
+            store: Store(
+                initialState: MoodEntryFeature.State(
+                    moodEntry: .mockMeh()
+                ),
+                reducer : {
+                    MoodEntryFeature()
+                },
+                withDependencies: { dependecyValues in
+                    dependecyValues.locationClient = .mockDenied
+                    dependecyValues.weatherClient = .mock(.cloudy, delay: 1.0)
+                }
             )
-            .foregroundStyle(.moodRed)
-            Text(
-                "red: \(Color.moodYellow.rgba.red), \ngreen: \(Color.moodYellow.rgba.green), \nblue: \(Color.moodYellow.rgba.blue)"
-            )
-            .foregroundStyle(.moodYellow)
-            Text(
-                "red: \(Color.moodGreen.rgba.red), \ngreen: \(Color.moodGreen.rgba.green), \nblue: \(Color.moodGreen.rgba.blue)"
-            )
-            .foregroundStyle(.moodGreen)
-        }
-        .padding()
+        )
     }
 }
 

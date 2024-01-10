@@ -28,6 +28,28 @@ public enum Activity: Codable, Equatable {
     case other(String)
 }
 
+extension Activity: CaseIterable {
+    public static var allCases: [Activity] = [
+        .family,
+        .friends,
+        .work,
+        .school,
+        .relationship,
+        .traveling,
+        .food,
+        .exercise,
+        .health,
+        .hobbies,
+        .gaming,
+        .weather,
+        .shopping,
+        .sleep,
+        .music,
+        .relaxing,
+        .other("")
+    ]
+}
+
 extension Activity: Identifiable {
     public typealias Id = Tagged<Self, String>
     
@@ -72,42 +94,121 @@ extension Activity: Identifiable {
 }
 
 extension Activity {
-    public var icon: Image {
+    
+    public var unselectedIconName: String {
         switch self {
         case .work:
-            return Image(systemName: "briefcase")
+            return "briefcase"
         case .family:
-            return Image(systemName: "house")
+            return "house"
         case .friends:
-            return Image(systemName: "person")
+            return "person"
         case .school:
-            return Image(systemName: "graduationcap")
+            return "graduationcap"
         case .relationship:
-            return Image(systemName: "person.2")
+            return "person.2"
         case .traveling:
-            return Image(systemName: "airplane")
+            return "airplane"
         case .food:
-            return Image(systemName: "fork.knife")
+            return "fork.knife"
         case .exercise:
-            return Image(systemName: "figure.run")
+            return "figure.run"
         case .health:
-            return Image(systemName: "heart")
+            return "heart"
         case .hobbies:
-            return Image(systemName: "star.circle")
+            return "star.circle"
         case .gaming:
-            return Image(systemName: "gamecontroller")
+            return "gamecontroller"
         case .weather:
-            return Image(systemName: "sun.rain")
+            return "sun.rain"
         case .shopping:
-            return Image(systemName: "bag")
+            return "bag"
         case .sleep:
-            return Image(systemName: "bed.double")
+            return "bed.double"
         case .music:
-            return Image(systemName: "headphones")
+            return "headphones"
         case .relaxing:
-            return Image(systemName: "sofa")
+            return "sofa"
         case .other:
-            return Image(systemName: "pencil")
+            return "pencil"
+        }
+    }
+    
+    public var selectedIconName: String {
+        switch self {
+        case .work:
+            return "briefcase.fill"
+        case .family:
+            return "house.fill"
+        case .friends:
+            return "person.fill"
+        case .school:
+            return "graduationcap.fill"
+        case .relationship:
+            return "person.2.fill"
+        case .traveling:
+            return "airplane"
+        case .food:
+            return "fork.knife"
+        case .exercise:
+            return "figure.run"
+        case .health:
+            return "heart.fill"
+        case .hobbies:
+            return "star.circle.fill"
+        case .gaming:
+            return "gamecontroller.fill"
+        case .weather:
+            return "sun.rain.fill"
+        case .shopping:
+            return "bag.fill"
+        case .sleep:
+            return "bed.double.fill"
+        case .music:
+            return "headphones"
+        case .relaxing:
+            return "sofa.fill"
+        case .other:
+            return "pencil"
+        }
+    }
+    
+    public var title: String {
+        switch self {
+        case .work:
+            return "Work"
+        case .family:
+            return "Family"
+        case .friends:
+            return "Friends"
+        case .school:
+            return "School"
+        case .relationship:
+            return "Relationship"
+        case .traveling:
+            return "Travel"
+        case .food:
+            return "Food"
+        case .exercise:
+            return "Exercise"
+        case .health:
+            return "Health"
+        case .hobbies:
+            return "Hobbies"
+        case .gaming:
+            return "Gaming"
+        case .weather:
+            return "Weather"
+        case .shopping:
+            return "Shopping"
+        case .sleep:
+            return "Sleep"
+        case .music:
+            return "Music"
+        case .relaxing:
+            return "Relaxing"
+        case .other:
+            return "Other"
         }
     }
 }

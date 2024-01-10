@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import EntryListFeature
+import MoodEntryFeature
 import Models
 import UIComponents
 
@@ -15,24 +16,57 @@ import UIComponents
 public struct RootFeature: Reducer {
     public struct State: Equatable {
         var entryList: EntryListFeature.State
-        
         var selectedTab: Tab = .entryList
+        @PresentationState var destination: Destination.State?
     }
     
     public enum Action {
         case entryList(EntryListFeature.Action)
         case selectedTabChanged(Tab)
+        case destination(PresentationAction<Destination.Action>)
+        case addMoodEntryButtonTapped
+    }
+    
+    @Reducer
+    public struct Destination: Reducer {
+        public enum State: Equatable {
+            case addMoodEntry(MoodEntryFeature.State)
+            case addNote
+        }
+        public enum Action: Equatable {
+            case addMoodEntry(MoodEntryFeature.Action)
+            case addNote
+        }
+        public var body: some ReducerOf<Self> {
+            Scope(state: /State.addMoodEntry, action: /Action.addMoodEntry) {
+                MoodEntryFeature()
+            }
+        }
     }
     
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .addMoodEntryButtonTapped:
+                state.destination = .addMoodEntry(MoodEntryFeature.State(moodEntry: .new))
+                return .none
+            case let .destination(.presented(.addMoodEntry(.delegate(delegate)))):
+                switch delegate {
+                case let .saveMoodEntry(moodEntry):
+                    state.entryList.entries.append(.mood(moodEntry))
+                }
+                return .none
+            case .destination:
+                return .none
             case .entryList:
                 return .none
             case let .selectedTabChanged(tab):
                 state.selectedTab = tab
                 return .none
             }
+        }
+        .ifLet(\.$destination, action: \.destination) {
+            Destination()
         }
         Scope(state: \.entryList, action: \.entryList) {
             EntryListFeature()
@@ -58,7 +92,7 @@ struct RootView: View {
                 firstAction: .firstOptionMock,
                 secondAction: .secondOptionMock,
                 onPrimaryAction: {
-                    print("Custom action 1")
+                    viewStore.send(.addMoodEntryButtonTapped)
                 },
                 onSecondaryAction: {
                     print("Custom action 2")
@@ -75,6 +109,13 @@ struct RootView: View {
                         .toolbar(.hidden, for: .tabBar)
                 }
             }
+            .sheet(
+                store: self.store.scope(
+                    state: \.$destination.addMoodEntry,
+                    action: \.destination.addMoodEntry)
+            ) { store in
+                MoodEntryRootView(store: store)
+            }
         }
     }
 }
@@ -82,7 +123,7 @@ struct RootView: View {
 #Preview {
     RootView(
         store: Store<RootFeature.State, RootFeature.Action>(
-            initialState: RootFeature.State(entryList: EntryListFeature.State(entries: .mockMood()))
+            initialState: RootFeature.State(entryList: EntryListFeature.State(entries: []))
         ) {
             RootFeature()
         }

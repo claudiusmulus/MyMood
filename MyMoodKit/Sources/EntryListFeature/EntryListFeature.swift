@@ -17,7 +17,7 @@ public struct EntryListFeature {
     public init() {}
     
     public struct State: Equatable {
-        var entries: IdentifiedArrayOf<Entry>
+        public var entries: IdentifiedArrayOf<Entry>
         
         public init(entries: IdentifiedArrayOf<Entry>) {
             self.entries = entries
@@ -64,9 +64,9 @@ public struct EntryListView: View {
                     if !moodEntry.activities.isEmpty {
                         ActivityView(activities: Array(moodEntry.activities.prefix(3)))
                     }
-                    if let quickNote = moodEntry.quickNote {
+                    if !moodEntry.quickNote.isEmpty {
                         Spacer(minLength: 2)
-                        Text(quickNote)
+                        Text(moodEntry.quickNote)
                             .foregroundStyle(.secondary)
                             .font(.body)
                     }
@@ -89,7 +89,7 @@ struct ActivityView: View {
     var body: some View {
         HStack {
             ForEach(activities) {
-                $0.icon
+                Image(systemName: $0.unselectedIconName)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

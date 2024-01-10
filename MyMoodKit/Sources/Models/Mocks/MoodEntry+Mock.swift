@@ -18,10 +18,12 @@ extension MoodEntry {
         return .init(
             id: .init(uuid()),
             date: now.advanced(by: 3600),
-            colorCode: .init(red: 1, green: 0.5, blue: 0.43, opacity: 1),
+            colorCode: .init(red: 1, green: 0.5, blue: 0.43, opacity: 1), 
+            moodScale: 0.1,
             mood: .terrible,
             activities: [.work, .sleep],
-            quickNote: "Terrible day"
+            quickNote: "Terrible day",
+            observations: ""
         )
     }
     
@@ -32,9 +34,11 @@ extension MoodEntry {
             id: .init(uuid()),
             date: now,
             colorCode: .init(red: 0.59, green: 0.83, blue: 0.36, opacity: 1),
+            moodScale: 0.7,
             mood: .good,
             activities: [.family, .exercise, .traveling],
-            quickNote: "Quick note title"
+            quickNote: "Quick note title",
+            observations: ""
         )
     }
     
@@ -45,9 +49,28 @@ extension MoodEntry {
             id: .init(uuid()),
             date: now,
             colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
+            moodScale: 0.5,
             mood: .okay,
             activities: [.work, .health],
-            quickNote: "Regular day"
+            quickNote: "Regular day",
+            observations: ""
         )
     }
+}
+
+extension MoodEntry {
+    public static var new: MoodEntry = {
+        @Dependency(\.uuid) var uuid
+        @Dependency(\.date.now) var now
+        return .init(
+            id: .init(uuid()),
+            date: now,
+            colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
+            moodScale: 0.5,
+            mood: .okay,
+            activities: [],
+            quickNote: "",
+            observations: ""
+        )
+    }()
 }
