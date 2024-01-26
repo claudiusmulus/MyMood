@@ -8,8 +8,8 @@
 import Foundation
 
 extension MenuAction {
-    public static var firstOptionMock: MenuAction {
-        .init(icon: "person", title: "First option")
+    public static var moodCheckin: MenuAction {
+        .init(icon: "face.smiling.inverse", title: "Mood check-in")
     }
     
     public static var secondOptionMock: MenuAction {

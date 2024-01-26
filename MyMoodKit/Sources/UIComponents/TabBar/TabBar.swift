@@ -155,7 +155,7 @@ struct EmptyItem: View {
 #Preview {
     CustomTabView(
         selection: .constant(.entryList),
-        firstAction: .firstOptionMock,
+        firstAction: .moodCheckin,
         secondAction: .secondOptionMock,
         onPrimaryAction: {
             print("Custom action 1")

@@ -9,6 +9,7 @@ import Foundation
 import Tagged
 import SwiftUI
 import IdentifiedCollections
+import Dependencies
 
 public struct MoodEntry: Codable, Equatable, Identifiable {
     public typealias Id = Tagged<Self, UUID>
@@ -22,4 +23,40 @@ public struct MoodEntry: Codable, Equatable, Identifiable {
     public var quickNote: String
     public var observations: String
     public var weatherEntry: WeatherEntry?
+    
+    public init() {
+        @Dependency(\.uuid) var uuid
+        @Dependency(\.date.now) var now
+        self.id = .init(uuid())
+        self.date = now
+        self.colorCode = .init(red: 1, green: 0.81, blue: 0.29, opacity: 1)
+        self.moodScale = 0.5
+        self.mood = .okay
+        self.activities = []
+        self.quickNote = ""
+        self.observations = ""
+        self.weatherEntry = nil
+    }
+    
+    public init(
+        id: Id,
+        date: Date,
+        colorCode: Color.Resolved,
+        moodScale: Double,
+        mood: Mood,
+        activities: IdentifiedArrayOf<Activity>,
+        quickNote: String,
+        observations: String,
+        weatherEntry: WeatherEntry? = nil
+    ) {
+        self.id = id
+        self.date = date
+        self.colorCode = colorCode
+        self.moodScale = moodScale
+        self.mood = mood
+        self.activities = activities
+        self.quickNote = quickNote
+        self.observations = observations
+        self.weatherEntry = weatherEntry
+    }
 }

@@ -50,6 +50,8 @@ struct MenuActionButton: View {
                                     backgroundColor: backgroundColor,
                                     borderColor: borderColor,
                                     fillColor: true,
+                                    firstAction: firstAction,
+                                    secondAction: secondAction,
                                     onFirstAction: onFirstAction,
                                     onSecondAction: onSecondAction
                                 )
@@ -64,6 +66,8 @@ struct MenuActionButton: View {
                 backgroundColor: backgroundColor,
                 borderColor: borderColor,
                 fillColor: false,
+                firstAction: firstAction,
+                secondAction: secondAction,
                 onFirstAction: onFirstAction,
                 onSecondAction: onSecondAction
             )
@@ -95,12 +99,20 @@ struct MenuActionButton: View {
         backgroundColor: Color,
         borderColor: Color,
         fillColor: Bool = true,
+        firstAction: MenuAction,
+        secondAction: MenuAction,
         onFirstAction: @escaping () -> Void,
         onSecondAction: @escaping () -> Void
     ) -> some View {
         Group {
-            secondaryActionButtons(onFirstAction: onFirstAction, onSecondAction: onSecondAction)
-                .foregroundStyle(fillColor ? backgroundColor : .clear)
+            secondaryActionButtons(
+                firstAction: firstAction,
+                secondAction: secondAction,
+                onFirstAction: onFirstAction,
+                onSecondAction: onSecondAction
+            )
+            .foregroundStyle(fillColor ? backgroundColor : .clear)
+            
             primaryActionButton(
                 backgroundColor: backgroundColor,
                 borderColor: borderColor,
@@ -148,14 +160,16 @@ struct MenuActionButton: View {
     
     @ViewBuilder
     private func secondaryActionButtons(
+        firstAction: MenuAction,
+        secondAction: MenuAction,
         onFirstAction: @escaping () -> Void,
         onSecondAction: @escaping () -> Void
     ) -> some View {
         VStack(spacing: 0) {
             secondaryActionButton(
                 tag: 0,
-                icon: "person",
-                text: "Action1",
+                icon: firstAction.icon,
+                text: firstAction.title,
                 showContent: isExpanded ? true : false,
                 padding: EdgeInsets(top: 30, leading: 30, bottom: 0, trailing: 30),
                 action: onFirstAction
@@ -165,8 +179,8 @@ struct MenuActionButton: View {
             
             secondaryActionButton(
                 tag: 1,
-                icon: "car",
-                text: "Action2",
+                icon: secondAction.icon,
+                text: secondAction.title,
                 showContent: isExpanded ? true : false,
                 padding: EdgeInsets(top: 0, leading: 30, bottom: 30, trailing: 30),
                 action: onSecondAction
@@ -248,7 +262,7 @@ struct MenuActionButton: View {
         selection: .constant(.entryList),
         backgroundColor: .backgroundActionButton,
         borderColor: .borderActionButton,
-        firstAction: .firstOptionMock,
+        firstAction: .moodCheckin,
         secondAction: .secondOptionMock,
         onFirstAction: {},
         onSecondAction: {}

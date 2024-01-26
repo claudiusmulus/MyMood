@@ -7,7 +7,8 @@
 
 import SwiftUI
 import Theme
-import MoodEntryFeature
+import RootFeature
+import EntryListFeature
 import ComposableArchitecture
 
 struct ContentView: View {
@@ -16,24 +17,22 @@ struct ContentView: View {
 //            store: Store(
 //                initialState: MoodEntryFeature.State(
 //                    moodEntry: .mockMeh()
-//                )
-//            ) {
-//                MoodEntryFeature()
-//            }
+//                ),
+//                reducer : {
+//                    MoodEntryFeature()
+//                },
+//                withDependencies: { dependecyValues in
+//                    dependecyValues.locationClient = .mockDenied
+//                    dependecyValues.weatherClient = .mock(.cloudy, delay: 1.0)
+//                }
+//            )
 //        )
-        MoodEntryRootView(
-            store: Store(
-                initialState: MoodEntryFeature.State(
-                    moodEntry: .mockMeh()
-                ),
-                reducer : {
-                    MoodEntryFeature()
-                },
-                withDependencies: { dependecyValues in
-                    dependecyValues.locationClient = .mockDenied
-                    dependecyValues.weatherClient = .mock(.cloudy, delay: 1.0)
-                }
-            )
+        RootView(
+            store: Store<RootFeature.State, RootFeature.Action>(
+                initialState: RootFeature.State(entryList: EntryListFeature.State(entries: []))
+            ) {
+                RootFeature()
+            }
         )
     }
 }

@@ -11,13 +11,13 @@ import Models
 import UIComponents
 
 struct WeatherWhenLocationDeniedView: View {
-    let store: StoreOf<MoodEntryFeature>
+    let store: StoreOf<ExtraContentPathFeature>
     
     struct ViewState: Equatable {
         @BindingViewState var weatherEntry: WeatherEntry?
         
-        init(bindingViewStore: BindingViewStore<MoodEntryFeature.State>) {
-            self._weatherEntry = bindingViewStore.$moodEntry.weatherEntry
+        init(bindingViewStore: BindingViewStore<ExtraContentPathFeature.State>) {
+            self._weatherEntry = bindingViewStore.$weatherEntry
         }
     }
     
@@ -49,7 +49,7 @@ struct WeatherWhenLocationDeniedView: View {
 
     }
     
-    private func textMessage(weatherStatus: MoodEntryFeature.State.WeatherStatus) -> String {
+    private func textMessage(weatherStatus: ExtraContentPathFeature.State.WeatherStatus) -> String {
         switch weatherStatus {
         case .loading:
             return .placeholder(length: 30)
@@ -62,7 +62,7 @@ struct WeatherWhenLocationDeniedView: View {
         }
     }
     
-    private func buttonLabel(weatherStatus: MoodEntryFeature.State.WeatherStatus) -> String {
+    private func buttonLabel(weatherStatus: ExtraContentPathFeature.State.WeatherStatus) -> String {
         switch weatherStatus {
         case .loading:
             return .placeholder(length: 10)
@@ -77,19 +77,19 @@ struct WeatherWhenLocationDeniedView: View {
 }
 
 #Preview {
-    WeatherWhenLocationDeniedView(
-        store: Store(
-            initialState: MoodEntryFeature.State(
-                moodEntry: .mockMeh()
-            ),
-            reducer : {
-                MoodEntryFeature()
-            },
-            withDependencies: { dependecyValues in
-                dependecyValues.locationClient = .mockDenied
-                dependecyValues.weatherClient = .mock(.sunny, delay: 0.5)
-            }
-        )
+  WeatherWhenLocationDeniedView(
+    store: Store(
+      initialState: ExtraContentPathFeature.State(
+        notes: "Regular day, gray and cloudy. Too cold to go outside"
+      ),
+      reducer : {
+        ExtraContentPathFeature()
+      },
+      withDependencies: { dependecyValues in
+        dependecyValues.locationClient = .mockDenied
+        dependecyValues.weatherClient = .mock(.sunny, delay: 0.5)
+      }
     )
-    .padding(.horizontal)
+  )
+  .padding(.horizontal)
 }

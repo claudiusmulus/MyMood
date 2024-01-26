@@ -9,10 +9,12 @@ import Foundation
 import ComposableArchitecture
 
 public enum DateContext {
-    case datePicker
+  case datePicker
+  case entryList
+  case monthSelector
 }
 
 @DependencyClient
 public struct FormattersClient {
-    public var formatDate: (_ date: Date, _ context: DateContext) -> String = { _, _ in "" }
+  public var formatDate: (_ date: Date, _ context: DateContext) -> String = { _, _ in "" }
 }

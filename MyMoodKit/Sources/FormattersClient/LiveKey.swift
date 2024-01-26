@@ -9,12 +9,20 @@ import Dependencies
 import Foundation
 
 extension FormattersClient {
-    public static var liveValue: FormattersClient = .init(
-        formatDate: { date, context in
-            switch context {
-            case .datePicker:
-                return date.formatted(date: .abbreviated, time: .shortened)
-            }
-        }
-    )
+  public static var liveValue: FormattersClient = .init(
+    formatDate: { date, context in
+      switch context {
+        case .datePicker:
+          return date.formatted(date: .abbreviated, time: .shortened)
+        case .entryList:
+          return date.formatted(date: .abbreviated, time: .omitted)
+        case .monthSelector:
+          return date.formatted(
+            Date.FormatStyle()
+              .month(.wide)
+              .year(.defaultDigits)
+          )
+      }
+    }
+  )
 }

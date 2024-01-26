@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "a5521dde99570789d8cb7c43e51418d7cd1a87ca",
-        "version" : "1.1.2"
+        "revision" : "76d7791b5bda47df7e3d4690c4c3aaf089730707",
+        "version" : "1.2.1"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections",
       "state" : {
-        "revision" : "a902f1823a7ff3c9ab2fba0f992396b948eda307",
-        "version" : "1.0.5"
+        "revision" : "d029d9d39c87bed85b1c50adee7c41795261a192",
+        "version" : "1.0.6"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "d8f81ca2d43026641c5c60729d01f245ccc32370",
-        "version" : "1.5.3"
+        "revision" : "ae491c9e3f66631e72d58db8bb4c27dfc3d3afd4",
+        "version" : "1.6.0"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "9783b58167f7618cb86011156e741cbc6f4cc864",
-        "version" : "1.1.2"
+        "revision" : "c31b1445c4fae49e6fdb75496b895a3653f6aefc",
+        "version" : "1.1.5"
       }
     },
     {
@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-syntax",
       "state" : {
-        "revision" : "6ad4ea24b01559dde0773e3d091f1b9e36175036",
-        "version" : "509.0.2"
+        "revision" : "43c802fb7f96e090dde015344a94b5e85779eff1",
+        "version" : "509.1.0"
       }
     },
     {

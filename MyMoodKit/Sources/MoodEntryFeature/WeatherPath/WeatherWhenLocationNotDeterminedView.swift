@@ -11,14 +11,14 @@ import Models
 import UIComponents
 
 struct WeatherWhenLocationNotDeterminedView: View {
-    let store: StoreOf<MoodEntryFeature>
+    let store: StoreOf<ExtraContentPathFeature>
     
     struct ViewState: Equatable {
         @BindingViewState var weatherEntry: WeatherEntry?
-        var weatherStatus: MoodEntryFeature.State.WeatherStatus
+        var weatherStatus: ExtraContentPathFeature.State.WeatherStatus
         
-        init(bindingViewStore: BindingViewStore<MoodEntryFeature.State>) {
-            self._weatherEntry = bindingViewStore.$moodEntry.weatherEntry
+        init(bindingViewStore: BindingViewStore<ExtraContentPathFeature.State>) {
+            self._weatherEntry = bindingViewStore.$weatherEntry
             self.weatherStatus = bindingViewStore.weatherStatus
         }
     }
@@ -60,7 +60,7 @@ struct WeatherWhenLocationNotDeterminedView: View {
 
     }
     
-    private func textMessage(weatherStatus: MoodEntryFeature.State.WeatherStatus) -> String {
+    private func textMessage(weatherStatus: ExtraContentPathFeature.State.WeatherStatus) -> String {
         switch weatherStatus {
         case .loading:
             return .placeholder(length: 30)
@@ -73,7 +73,7 @@ struct WeatherWhenLocationNotDeterminedView: View {
         }
     }
     
-    private func buttonLabel(weatherStatus: MoodEntryFeature.State.WeatherStatus) -> String {
+    private func buttonLabel(weatherStatus: ExtraContentPathFeature.State.WeatherStatus) -> String {
         switch weatherStatus {
         case .loading:
             return .placeholder(length: 10)
@@ -88,21 +88,20 @@ struct WeatherWhenLocationNotDeterminedView: View {
 }
 
 #Preview {
-    WeatherWhenLocationNotDeterminedView(
-        store: Store(
-            initialState: MoodEntryFeature.State(
-                moodEntry: .mockMeh(),
-                weatherDisplay: .whenLocationNotDetermined,
-                weatherStatus: .none
-            ),
-            reducer : {
-                MoodEntryFeature()
-            },
-            withDependencies: { dependecyValues in
-                dependecyValues.locationClient = .mockAuthorizedWhenInUse
-                dependecyValues.weatherClient = .mock(.sunny, delay: 0.5)
-            }
-        )
+  WeatherWhenLocationNotDeterminedView(
+    store: Store(
+      initialState: ExtraContentPathFeature.State(
+        notes: "Regular day, gray and cloudy. Too cold to go outside",
+        weatherStatus: .none
+      ),
+      reducer : {
+        ExtraContentPathFeature()
+      },
+      withDependencies: { dependecyValues in
+        dependecyValues.locationClient = .mockNotDetermined
+        dependecyValues.weatherClient = .mock(.sunny, delay: 0.5)
+      }
     )
-    .padding(.horizontal)
+  )
+  .padding(.horizontal)
 }

@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "LocationClient", targets: ["LocationClient"]),
         .library(name: "Models", targets: ["Models"]),
         .library(name: "MoodEntryFeature", targets: ["MoodEntryFeature"]),
+        .library(name: "NoteEntryFeature", targets: ["NoteEntryFeature"]),
         .library(name: "RootFeature", targets: ["RootFeature"]),
         .library(name: "Theme", targets: ["Theme"]),
         .library(name: "UIComponents", targets: ["UIComponents"]),
@@ -43,6 +44,8 @@ let package = Package(
         .target(
             name: "EntryListFeature",
             dependencies: [
+                "ColorGeneratorClient",
+                "FormattersClient",
                 "Theme",
                 "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
@@ -93,6 +96,7 @@ let package = Package(
                 "Theme",
                 "LocationClient",
                 "Models",
+                "NoteEntryFeature",
                 "UIComponents",
                 "WeatherClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
@@ -103,6 +107,19 @@ let package = Package(
             dependencies: [
                 "MoodEntryFeature",
             ]
+        ),
+        .target(
+          name: "NoteEntryFeature",
+          dependencies: [
+            "UIComponents",
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+          ]
+        ),
+        .testTarget(
+          name: "NoteEntryFeatureTests",
+          dependencies: [
+            "NoteEntryFeature",
+          ]
         ),
         .target(
             name: "RootFeature",

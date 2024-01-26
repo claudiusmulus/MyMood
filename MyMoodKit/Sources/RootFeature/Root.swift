@@ -14,10 +14,25 @@ import UIComponents
 
 @Reducer
 public struct RootFeature: Reducer {
+    
+    public init(){
+        
+    }
+    
     public struct State: Equatable {
         var entryList: EntryListFeature.State
-        var selectedTab: Tab = .entryList
+        var selectedTab: Tab
         @PresentationState var destination: Destination.State?
+        
+        public init(
+            entryList: EntryListFeature.State,
+            selectedTab: Tab = .entryList,
+            destination: Destination.State? = nil
+        ) {
+            self.entryList = entryList
+            self.selectedTab = selectedTab
+            self.destination = destination
+        }
     }
     
     public enum Action {
@@ -48,12 +63,12 @@ public struct RootFeature: Reducer {
         Reduce { state, action in
             switch action {
             case .addMoodEntryButtonTapped:
-                state.destination = .addMoodEntry(MoodEntryFeature.State(moodEntry: .new))
+                state.destination = .addMoodEntry(MoodEntryFeature.State(moodEntry: MoodEntry()))
                 return .none
             case let .destination(.presented(.addMoodEntry(.delegate(delegate)))):
                 switch delegate {
                 case let .saveMoodEntry(moodEntry):
-                    state.entryList.entries.append(.mood(moodEntry))
+                    state.entryList.addEntry(.mood(moodEntry))
                 }
                 return .none
             case .destination:
@@ -71,25 +86,23 @@ public struct RootFeature: Reducer {
         Scope(state: \.entryList, action: \.entryList) {
             EntryListFeature()
         }
+        ._printChanges()
     }
 }
 
-struct RootView: View {
+public struct RootView: View {
     let store: StoreOf<RootFeature>
     
-    struct ViewState {
-        var selectedTab: Tab
-        
-        init(state: RootFeature.State) {
-            self.selectedTab = state.selectedTab
-        }
+    public init(store: StoreOf<RootFeature>) {
+        self.store = store
     }
-    var body: some View {
+    
+    public var body: some View {
         
         WithViewStore(self.store, observe: \.selectedTab) { viewStore in
             CustomTabView(
                 selection: viewStore.binding(send: RootFeature.Action.selectedTabChanged),
-                firstAction: .firstOptionMock,
+                firstAction: .moodCheckin,
                 secondAction: .secondOptionMock,
                 onPrimaryAction: {
                     viewStore.send(.addMoodEntryButtonTapped)
@@ -100,9 +113,14 @@ struct RootView: View {
             ) {
                 switch $0 {
                 case .entryList:
-                    EntryListView(store: self.store.scope(state: \.entryList, action: \.entryList))
-                        .tag(Tab.entryList)
-                        .toolbar(.hidden, for: .tabBar)
+                    NavigationStack {
+                        EntryListView(store: self.store.scope(state: \.entryList, action: \.entryList))
+                            .tag(Tab.entryList)
+                            .toolbar(.hidden, for: .tabBar)
+                            .navigationBarTitleDisplayMode(.inline)
+                    }
+                    
+
                 case .stats:
                     Text("Stats")
                         .tag(Tab.stats)
@@ -114,7 +132,8 @@ struct RootView: View {
                     state: \.$destination.addMoodEntry,
                     action: \.destination.addMoodEntry)
             ) { store in
-                MoodEntryRootView(store: store)
+              MoodEntryRootView(store: store)
+                .interactiveDismissDisabled(true)
             }
         }
     }
@@ -123,9 +142,16 @@ struct RootView: View {
 #Preview {
     RootView(
         store: Store<RootFeature.State, RootFeature.Action>(
-            initialState: RootFeature.State(entryList: EntryListFeature.State(entries: []))
-        ) {
-            RootFeature()
-        }
+            initialState: RootFeature.State(
+                entryList: EntryListFeature.State(entries: .mockModBad())
+            ),
+            reducer: {
+                RootFeature()
+            },
+            withDependencies: { dependecyValues in
+                dependecyValues.locationClient = .mockNotDetermined
+                dependecyValues.weatherClient = .mock(.sunny, delay: 1.0)
+            }
+        )
     )
 }
