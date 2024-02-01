@@ -8,7 +8,7 @@
 import Tagged
 import SwiftUI
 
-public enum Activity: Codable, Equatable {
+public enum Activity: String, Codable, Equatable, RawRepresentable {
     case work
     case family
     case friends
@@ -25,7 +25,7 @@ public enum Activity: Codable, Equatable {
     case sleep
     case music
     case relaxing
-    case other(String)
+    case other
 }
 
 extension Activity: CaseIterable {
@@ -46,7 +46,7 @@ extension Activity: CaseIterable {
         .sleep,
         .music,
         .relaxing,
-        .other("")
+        .other
     ]
 }
 
@@ -87,8 +87,8 @@ extension Activity: Identifiable {
             return .init("music")
         case .relaxing:
             return .init("relaxing")
-        case let .other(otherActivity):
-            return .init("other-" + otherActivity)
+        case .other:
+            return .init("other")
         }
     }
 }

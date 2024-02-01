@@ -17,6 +17,12 @@ extension DependencyValues {
 }
 
 extension WeatherClient {
+  public static var testValue: WeatherClient = WeatherClient(
+    weather: unimplemented("WeatherClient-weather")
+  )
+}
+
+extension WeatherClient {
     public static let mockSunny: WeatherClient = WeatherClient(weather: { _, _ in .sunny })
     public static func mock(_ response: WeatherEntry, delay: CGFloat = 0) -> WeatherClient {
         WeatherClient(weather: { _, _ in

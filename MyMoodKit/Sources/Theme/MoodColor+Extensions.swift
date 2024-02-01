@@ -98,8 +98,8 @@ extension ShapeStyle where Self == Color {
     }
     
     public static var tabBar: Color {
-        //Color(MoodColor.tabBar)
-        Color(red: 0.74, green: 0.74, blue: 0.74)
+        Color(MoodColor.tabBar)
+        //Color(red: 0.74, green: 0.74, blue: 0.74)
     }
     
     public static var backgroundActionButton: Color {

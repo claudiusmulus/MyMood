@@ -6,6 +6,7 @@
   //
 
 import Dependencies
+import Foundation
 
 extension Array where Element == MoodEntry {
   public static var mock: [MoodEntry] = [.mockGood(), .mockMeh(), .mockBad()]
@@ -49,7 +50,7 @@ extension MoodEntry {
     @Dependency(\.date.now) var now
     return .init(
       id: .init(uuid()),
-      date: now,
+      date: now.advanced(by: -86_400),
       colorCode: .init(red: 0.59, green: 0.83, blue: 0.36, opacity: 1),
       moodScale: 1,
       mood: .awesome,
@@ -66,6 +67,20 @@ extension MoodEntry {
     return .init(
       id: .init(uuid()),
       date: now,
+      colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
+      moodScale: 0.5,
+      mood: .okay,
+      activities: [.work, .health],
+      quickNote: "Regular day",
+      observations: "Regular day, gray and cloudy. Too cold to go outside",
+      weatherEntry: .overcast
+    )
+  }
+  
+  public static func mock(id: Int, date: Date) -> MoodEntry {
+    return .init(
+      id: .init(UUID(id)),
+      date: date,
       colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
       moodScale: 0.5,
       mood: .okay,

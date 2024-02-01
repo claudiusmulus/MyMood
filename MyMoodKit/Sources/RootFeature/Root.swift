@@ -96,6 +96,8 @@ public struct RootView: View {
     public init(store: StoreOf<RootFeature>) {
         self.store = store
     }
+  
+  @State private var showContentActionVisibillity = false
     
     public var body: some View {
         
@@ -103,9 +105,12 @@ public struct RootView: View {
             CustomTabView(
                 selection: viewStore.binding(send: RootFeature.Action.selectedTabChanged),
                 firstAction: .moodCheckin,
-                secondAction: .secondOptionMock,
+                secondAction: .secondOptionMock, 
+                onMenuAction: {
+                  self.showContentActionVisibillity = false
+                },
                 onPrimaryAction: {
-                    viewStore.send(.addMoodEntryButtonTapped)
+                  viewStore.send(.addMoodEntryButtonTapped)
                 },
                 onSecondaryAction: {
                     print("Custom action 2")
@@ -114,7 +119,10 @@ public struct RootView: View {
                 switch $0 {
                 case .entryList:
                     NavigationStack {
-                        EntryListView(store: self.store.scope(state: \.entryList, action: \.entryList))
+                        EntryListView(
+                          store: self.store.scope(state: \.entryList, action: \.entryList),
+                          showExtraContentActions: self.$showContentActionVisibillity
+                        )
                             .tag(Tab.entryList)
                             .toolbar(.hidden, for: .tabBar)
                             .navigationBarTitleDisplayMode(.inline)
@@ -143,7 +151,7 @@ public struct RootView: View {
     RootView(
         store: Store<RootFeature.State, RootFeature.Action>(
             initialState: RootFeature.State(
-                entryList: EntryListFeature.State(entries: .mockModBad())
+                entryList: EntryListFeature.State()
             ),
             reducer: {
                 RootFeature()

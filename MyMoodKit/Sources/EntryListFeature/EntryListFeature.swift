@@ -13,6 +13,7 @@ import UIComponents
 import CasePaths
 import ColorGeneratorClient
 import FormattersClient
+import PersistentClient
 
 @Reducer
 public struct EntryListFeature {
@@ -20,46 +21,69 @@ public struct EntryListFeature {
   public init() {}
   
   public struct State: Equatable {
-    public var entries: IdentifiedArrayOf<Entry>
     
-    var backgroundColor: Color
+    public struct SectionEntryValue: Equatable {
+      var entries: IdentifiedArrayOf<Entry>
+      var formattedDate: String
+      var averageColor: Color
+      
+      public init(entries: IdentifiedArrayOf<Entry>, formattedDate: String, averageColor: Color) {
+        self.entries = entries
+        self.formattedDate = formattedDate
+        self.averageColor = averageColor
+      }
+    }
     
-    public init(entries: IdentifiedArrayOf<Entry>) {
+    public init() {
       @Dependency(\.date.now) var now
       @Dependency(\.calendar) var calendar
-      self.entries = entries
-      self.moodEntriesByDate = entries.groupedBy([.month, .year], calendar: calendar)
       let currentMonthComponents = calendar.dateComponents([.month, .year], from: now)
       self.nowMonthDate = calendar.date(from: currentMonthComponents) ?? now
       self.currentMonthDate = self.nowMonthDate
-      self.backgroundColor = entries.moodAverageColor
-      // By default display the current month entries
-      self.visibleMoodEntries = self.moodEntriesByDate[self.currentMonthDate] ?? []
-      self.isNextButtonEnabled = self.currentMonthDate < self.nowMonthDate
-      self.isPreviousButtonEnabled = self.previousMonthWithEntries(currentMonth: self.currentMonthDate) != nil
+    }
+    
+    mutating func addEntries(_ entries: IdentifiedArrayOf<Entry>) {
+      @Dependency(\.calendar) var calendar
+      @Dependency(\.formatters) var formatters
+      self.entriesByDate = entries.groupedBy(
+        dateComponents: [.month, .year],
+        sectionDateComponents: [.day, .month, .year],
+        calendar: calendar,
+        formatter: formatters.formatDate(.entryList)
+      )
     }
     
     public mutating func addEntry(_ entry: Entry) {
       @Dependency(\.calendar) var calendar
-      self.entries.insert(entry, at: 0)
-      self.moodEntriesByDate = entries.groupedBy([.month, .year], calendar: calendar)
-      self.visibleMoodEntries = self.moodEntriesByDate[self.currentMonthDate] ?? []
-      self.backgroundColor = self.entries.moodAverageColor
-      self.isNextButtonEnabled = self.currentMonthDate < self.nowMonthDate
-      self.isPreviousButtonEnabled = self.previousMonthWithEntries(currentMonth: self.currentMonthDate) != nil
+      @Dependency(\.formatters) var formatters
+      
+      self.entriesByDate.appendEntry(
+        entry,
+        calendar: calendar,
+        formatter: formatters.formatDate(.entryList)
+      )
     }
     
     // Data
-    private var moodEntriesByDate: [Date: IdentifiedArrayOf<MoodEntry>]
+    public var entriesByDate: [Date: [Date: SectionEntryValue]] = [:] {
+      didSet {
+        self.visibleEntries = self.entriesByDate[self.currentMonthDate] ?? [:]
+        self.isNextButtonEnabled = self.currentMonthDate < self.nowMonthDate
+        self.isPreviousButtonEnabled = self.previousMonthWithEntries(currentMonth: self.currentMonthDate) != nil
+      }
+    }
     public var currentMonthDate: Date
-    public var visibleMoodEntries: IdentifiedArrayOf<MoodEntry>
-    let nowMonthDate: Date
+    public var visibleEntries: [Date: SectionEntryValue] = [:]
+    public var nowMonthDate: Date
+    public var isDataFetched: Bool = false
+    public var isNextButtonEnabled: Bool = false
+    public var isPreviousButtonEnabled: Bool = false
     
-    public var datesWithEntries: [Date] {
-      Array(self.moodEntriesByDate.keys).sorted(by: <)
+    private var datesWithEntries: [Date] {
+      Array(self.entriesByDate.keys).sorted(by: <)
     }
     
-    public func previousMonthWithEntries(currentMonth: Date) -> Date? {
+    func previousMonthWithEntries(currentMonth: Date) -> Date? {
       guard let currentDateIndex = self.datesWithEntries.firstIndex(of: currentMonth),
             currentDateIndex > 0 else {
         return nil
@@ -68,56 +92,77 @@ public struct EntryListFeature {
       return self.datesWithEntries[previousIndex]
     }
     
-    public func nextMonthWithEntries(currentMonth: Date) -> Date? {
+    func nextMonthWithEntries(currentMonth: Date) -> Date? {
       guard let currentDateIndex = self.datesWithEntries.firstIndex(of: currentMonth),
-            currentDateIndex > 0, currentDateIndex < self.datesWithEntries.count - 1 else {
+            currentDateIndex < self.datesWithEntries.count - 1 else {
         return nil
       }
-      let previousIndex = self.datesWithEntries.index(before: currentDateIndex)
-      return self.datesWithEntries[previousIndex]
+      let nextIndex = self.datesWithEntries.index(after: currentDateIndex)
+      return self.datesWithEntries[nextIndex]
     }
     
     var currentMonthDateFormatted: String {
       @Dependency(\.formatters.formatDate) var formatDate
       
-      return formatDate(self.currentMonthDate, .monthSelector)
+      return formatDate(.monthSelector)(self.currentMonthDate)
     }
     
-    public mutating func updateVisibleEntries(date: Date) {
-      self.visibleMoodEntries = self.moodEntriesByDate[date] ?? []
+    mutating func updateVisibleEntries(date: Date) {
+      self.visibleEntries = self.entriesByDate[date] ?? [:]
+      self.isNextButtonEnabled = self.currentMonthDate < self.nowMonthDate
+      self.isPreviousButtonEnabled = self.previousMonthWithEntries(currentMonth: self.currentMonthDate) != nil
     }
-    
-    public var isNextButtonEnabled: Bool = false
-    
-    public var isPreviousButtonEnabled: Bool = false
   }
   
   public enum Action: Equatable {
     case nextMonthButtonTapped
     case previousMonthButtonTapped
+    case onAppear
+    case fetchedEntriesSuccess(IdentifiedArrayOf<Entry>)
+    case fetchedEntriesFailure(String)
   }
   
   @Dependency(\.calendar) var calendar
-    
+  @Dependency(\.persistentClient) var persistentClient
+  
   public var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
+        case let .fetchedEntriesSuccess(entries):
+          state.addEntries(entries)
+          state.isDataFetched = true
+          return .none
+        case .fetchedEntriesFailure:
+          state.isDataFetched = true
+          return .none
         case .nextMonthButtonTapped:
-          guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: state.currentMonthDate) else {
+          guard let nextMonth = state.nextMonthWithEntries(currentMonth: state.currentMonthDate) else {
             return .none
           }
           state.currentMonthDate = nextMonth
           state.updateVisibleEntries(date: nextMonth)
-          state.isNextButtonEnabled = state.currentMonthDate < state.nowMonthDate
           
           return .none
+        case .onAppear:
+          return .run { send in
+            do {
+              let entries = try self.persistentClient.fetchEntries(nil)
+              
+              await send(.fetchedEntriesSuccess(entries))
+              
+            } catch {
+              
+            }
+            
+          }
         case .previousMonthButtonTapped:
-          guard let previousMonth = calendar.date(byAdding: .month, value: -1, to: state.currentMonthDate) else {
+          guard let previousMonth = state.previousMonthWithEntries(currentMonth: state.currentMonthDate) else {
             return .none
           }
           state.currentMonthDate = previousMonth
           state.updateVisibleEntries(date: previousMonth)
-
+          
+          
           return .none
       }
     }
@@ -126,37 +171,10 @@ public struct EntryListFeature {
   
 }
 
-extension IdentifiedArray where Element == Entry {
-  var moodAverageColor: Color {
-    @Dependency(\.colorGenerator) var colorGenerator
-    
-    guard self.count > 0 else {
-      return Color(colorGenerator.generatedColor(amount: 0.5))
-    }
-    
-    let sum = self.compactMap(/Entry.mood).map(\.moodScale).reduce(0, +)
-    let moodScaleAverage =  Float(sum) / Float(self.count)
-    
-    return Color(colorGenerator.generatedColor(amount: moodScaleAverage))
-  }
-  
-  func groupedBy(_ dateComponents: Set<Calendar.Component>, calendar: Calendar) -> [Date: IdentifiedArrayOf<MoodEntry>] {
-    let dict: [Date: IdentifiedArrayOf<MoodEntry>] = [:]
-    
-    return self.compactMap(/Entry.mood).reduce(into: dict) { partialResult, moodEntry in
-      let entryDateComponents = calendar.dateComponents(dateComponents, from: moodEntry.date)
-      guard let date = calendar.date(from: entryDateComponents) else {
-        return
-      }
-      let current = partialResult[date] ?? []
-      partialResult[date] = current + [moodEntry]
-    }
-  }
-}
-
 struct EntryMonthSelector: View {
   
   let store: StoreOf<EntryListFeature>
+  @Binding var showMonthOptions: Bool
   
   struct ViewState: Equatable {
     var dates: [Date]
@@ -164,11 +182,9 @@ struct EntryMonthSelector: View {
     var selectedDateFormatted: String
     var isNextButtonEnabled: Bool
     var isPreviousButtonEnabled: Bool
-    var backgroundColor: Color
     
     init(_ state: EntryListFeature.State) {
-      self.backgroundColor = state.backgroundColor
-      self.dates = state.datesWithEntries
+      self.dates = Array(state.entriesByDate.keys)
       self.selectedDate = state.currentMonthDate
       self.selectedDateFormatted = state.currentMonthDateFormatted
       self.isNextButtonEnabled = state.isNextButtonEnabled
@@ -179,73 +195,198 @@ struct EntryMonthSelector: View {
   var body: some View {
     WithViewStore(self.store, observe: ViewState.init) { viewStore in
       
-      HStack {
-        Button(
-          action: {
-            viewStore.send(.previousMonthButtonTapped, animation: .snappy)
-          },
-          label: {
-            Image(systemName: "chevron.left")
-              .font(.title3.bold())
-              .foregroundStyle(viewStore.isPreviousButtonEnabled ? .black : .black.opacity(0.3))
+      ZStack(alignment: .top) {
+        
+        contentBackground()
+          .onTapGesture {
+            withAnimation(.snappy) {
+              self.showMonthOptions = false
+            }
           }
-        )
-        .scaledButton(scaleFactor: 0.9)
-        .disabled(!viewStore.isPreviousButtonEnabled)
-        .frame(width: 44, height: 44)
         
-        Spacer()
-        
-        Button(
-          action: {
+        VStack(spacing: 0) {
+          HStack {
+            Button(
+              action: {
+                viewStore.send(.previousMonthButtonTapped, animation: .snappy)
+              },
+              label: {
+                Image(systemName: "chevron.left")
+                  .font(.title3.bold())
+                  .foregroundStyle(viewStore.isPreviousButtonEnabled ? .black : .black.opacity(0.3))
+              }
+            )
+            .scaledButton(scaleFactor: 0.9)
+            .disabled(!viewStore.isPreviousButtonEnabled)
+            .frame(width: 44, height: 44)
             
-          },
-          label: {
-            Text(viewStore.selectedDateFormatted)
-              .font(.title3.bold())
+            Spacer()
+            
+            Button(
+              action: {
+                withAnimation(.snappy) {
+                  self.showMonthOptions.toggle()
+                }
+              },
+              label: {
+                Text(viewStore.selectedDateFormatted)
+                  .font(.title3.bold())
+              }
+            )
+            .scaledButton()
+            
+            Spacer()
+            
+            Button(
+              action: {
+                viewStore.send(.nextMonthButtonTapped, animation: .snappy)
+              },
+              label: {
+                Image(systemName: "chevron.right")
+                  .font(.title3.bold())
+                  .foregroundStyle(viewStore.isNextButtonEnabled ? .black : .black.opacity(0.3))
+              }
+            )
+            .disabled(!viewStore.isNextButtonEnabled)
+            .scaledButton(scaleFactor: 0.9)
+            .frame(width: 44, height: 44)
           }
-        )
-        .scaledButton()
+          .frame(maxWidth: .infinity)
+          .padding(.horizontal)
+          .padding(.bottom, 10)
+          
+          Color(red: 0.82, green: 0.84, blue: 0.86)
+            .frame(height: 1)
+            .frame(maxWidth: .infinity)
+        }
+        .background(.tabBar)
+        .zIndex(2.0)
         
+        if self.showMonthOptions {
+          Rectangle()
+            .fill(.orange)
+            .frame(height: 200)
+            .zIndex(1.0)
+            .transition(.move(edge: .top))
+        }
+      }
+      
+    }
+  }
+  
+  @ViewBuilder
+  private func contentBackground(fill: some ShapeStyle = .ultraThinMaterial) -> some View {
+    Rectangle()
+      .fill(fill)
+      .opacity(0.9)
+      .ignoresSafeArea()
+      .animation(.smooth) {
+        $0.opacity(self.showMonthOptions ? 1 : 0)
+      }
+  }
+}
+
+public struct MoodEntryView: View {
+  let moodEntry: MoodEntry
+  let formattedDate: String?
+  
+  public var body: some View {
+    
+    HStack(alignment: .firstTextBaseline) {
+      VStack(alignment: .leading, spacing: 5) {
+        
+        if let formattedDate {
+          Text(formattedDate)
+            .font(.body)
+            .foregroundStyle(.black)
+        }
+        
+        Text(moodEntry.mood.title)
+          .minimumScaleFactor(0.6)
+          .foregroundStyle(Color(moodEntry.colorCode))
+          .lineLimit(1)
+          .font(.title3.bold())
+        
+        if !moodEntry.activities.isEmpty {
+          ActivityView(activities: Array(moodEntry.activities.prefix(3)))
+        }
+        
+        if let notes = moodEntry.observations, !notes.isEmpty {
+          Text(notes)
+            .lineLimit(2)
+            .foregroundStyle(.black)
+            .font(.caption)
+            .padding(.top, 2)
+        }
+        
+      }
+      
+      if let weatherEntryIconName = moodEntry.weatherEntry?.selectedIcon {
         Spacer()
         
-        Button(
-          action: {
-            viewStore.send(.nextMonthButtonTapped, animation: .snappy)
-          },
-          label: {
-            Image(systemName: "chevron.right")
-              .font(.title3.bold())
-              .foregroundStyle(viewStore.isNextButtonEnabled ? .black : .black.opacity(0.3))
-          }
-        )
-        .disabled(!viewStore.isNextButtonEnabled)
-        .scaledButton(scaleFactor: 0.9)
-        .frame(width: 44, height: 44)
+        Image(systemName: weatherEntryIconName)
+          .font(.title2)
+          .foregroundStyle(.black)
+          .padding(.trailing, 10)
       }
-      .frame(maxWidth: .infinity)
-      .padding(.horizontal)
     }
   }
 }
 
-
-
+public struct MoodEntrySectionView: View {
+  
+  let date: String
+  let entries: IdentifiedArrayOf<Entry>
+  let sectionColor: Color
+  
+  public var body: some View {
+    VStack(spacing: 0) {
+      Text(date)
+        .font(.title3.bold())
+        .frame(maxWidth: .infinity)
+        .padding(.vertical)
+        .background(sectionColor)
+      
+      VStack(spacing: 1) {
+        ForEach(self.entries) { entry in
+          switch entry {
+            case let .mood(moodEntry):
+              MoodEntryView(moodEntry: moodEntry, formattedDate: nil)
+                .padding()
+                .moodSectionRow(
+                  accentColor: Color(moodEntry.colorCode),
+                  backgroundColor: .white,
+                  dividerColor: sectionColor
+                )
+          }
+        }
+      }
+    }
+  }
+}
 
 public struct EntryListView: View {
   
   let store: StoreOf<EntryListFeature>
-  public init(store: StoreOf<EntryListFeature>) {
+  @Binding private var showExtraContentActions: Bool
+  
+  public init(
+    store: StoreOf<EntryListFeature>,
+    showExtraContentActions: Binding<Bool>
+  ) {
     self.store = store
+    self._showExtraContentActions = showExtraContentActions
   }
   
   struct ViewState: Equatable {
-    var moodEntries: IdentifiedArrayOf<MoodEntry>
-    var backgroundColor: Color
+    var moodEntries: [Date: EntryListFeature.State.SectionEntryValue]
+    var sections: [Date]
+    var isDataFetched: Bool
     
     init(_ state: EntryListFeature.State) {
-      self.moodEntries = state.visibleMoodEntries
-      self.backgroundColor = state.backgroundColor
+      self.moodEntries = state.visibleEntries
+      self.sections = Array(self.moodEntries.keys).sorted(by: >)
+      self.isDataFetched = state.isDataFetched
     }
   }
   
@@ -253,62 +394,39 @@ public struct EntryListView: View {
     WithViewStore(self.store, observe: ViewState.init) { viewStore in
       
       ZStack(alignment: .top) {
-        viewStore.backgroundColor.ignoresSafeArea()
+        Color.tabBar.ignoresSafeArea()
         
-        VStack {
-          EntryMonthSelector(store: self.store)
-          
-          EntryStackView(entries: viewStore.moodEntries) { moodEntry in
-            HStack(alignment: .firstTextBaseline) {
-              VStack(alignment: .leading, spacing: 5) {
-                HStack(alignment: .firstTextBaseline) {
-                  Text(moodEntry.mood.title)
-                    .minimumScaleFactor(0.6)
-                    .foregroundStyle(.black)
-                    .lineLimit(1)
-                    .font(.title3.bold())
-                }
-                if !moodEntry.activities.isEmpty {
-                  ActivityView(activities: Array(moodEntry.activities.prefix(3)))
-                }
-                
-                if !moodEntry.observations.isEmpty {
-                  Text(moodEntry.observations)
-                    .lineLimit(2)
-                    .foregroundStyle(.black)
-                    .font(.caption)
-                    .padding(.top, 2)
-                }
-                
-              }
-              Spacer()
-              VStack {
-                VStack(alignment: .trailing) {
-                  Text(moodEntry.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.body)
-                    .foregroundStyle(.black)
-                  
-                  if let weatherEntry = moodEntry.weatherEntry {
-                    Image(systemName: weatherEntry.selectedIcon)
-                      .font(.title2)
-                      .foregroundStyle(.black)
-                      .padding(.top, 1)
-                    
-                  }
-                }
-              }
+        EntryMonthSelector(store: self.store, showMonthOptions: self.$showExtraContentActions)
+          .zIndex(2.0)
+        
+        EntryStackView(
+          entries: viewStore.moodEntries,
+          singleContent: { date, entry in
+            switch entry {
+              case let .mood(moodEntry):
+                MoodEntryView(moodEntry: moodEntry, formattedDate: date)
+                  .padding()
+                  .moodSingleRow(
+                    accentColor: Color(moodEntry.colorCode),
+                    backgroundColor: .white
+                  )
+                  .padding(.horizontal)
+                  .padding(.vertical, 8)
             }
-            .padding()
-            .moodRow(
-              accentColor: Color(moodEntry.colorCode),
-              backgroundColor: .white,
-              moodScale: moodEntry.moodScale,
-              shadowColor: .black.opacity(0.15)
-            )
-            .padding(.horizontal)
-            .padding(.vertical, 8)
+          },
+          sectionContent: { date, entries, color in
+            MoodEntrySectionView(date: date, entries: entries, sectionColor: color)
+              .moodSection()
+              .padding(.horizontal)
+              .padding(.top, 2)
           }
-          
+        )
+        .padding(.top, 54)
+        
+      }
+      .task {
+        if !viewStore.isDataFetched {
+          viewStore.send(.onAppear)
         }
       }
     }
@@ -328,39 +446,54 @@ struct ActivityView: View {
   }
 }
 
-struct EntryStackView<Element: Identifiable, MoodEntryContent: View>: View {
+struct EntryStackView<MoodEntrySingleContent: View, MoodEntrySectionContent: View>: View {
   
-  let entries: IdentifiedArrayOf<Element>
-  let content: (Element) -> MoodEntryContent
+  let entries: [Date: EntryListFeature.State.SectionEntryValue]
+  let sections: [Date]
+  let sectionContent: (String, IdentifiedArrayOf<Entry>, Color) -> MoodEntrySectionContent
+  let singleContent: (String, Entry) -> MoodEntrySingleContent
   
   init(
-    entries: IdentifiedArrayOf<Element>,
-    @ViewBuilder content: @escaping (Element) -> MoodEntryContent) {
-      self.entries = entries
-      self.content = content
-    }
+    entries: [Date: EntryListFeature.State.SectionEntryValue],
+    @ViewBuilder singleContent: @escaping (String, Entry) -> MoodEntrySingleContent,
+    @ViewBuilder sectionContent: @escaping (String, IdentifiedArrayOf<Entry>, Color) -> MoodEntrySectionContent
+  ) {
+    self.entries = entries
+    self.sections = Array(entries.keys).sorted(by: >)
+    self.sectionContent = sectionContent
+    self.singleContent = singleContent
+  }
   
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading, spacing: 0, content: {
-        ForEach(self.entries, content: content)
-//        ForEach(entries) { entry in
-//          switch entry {
-//            case let .mood(moodEntry):
-//              moodEntryView(moodEntry)
-//          }
-//        }
+      LazyVStack(alignment: .leading, spacing: 10, content: {
+        ForEach(self.sections, id: \.self) { section in
+          if let entrySection = self.entries[section], !entrySection.entries.isEmpty {
+            if entrySection.entries.count == 1 {
+              singleContent(entrySection.formattedDate, entrySection.entries[0])
+            } else {
+              sectionContent(entrySection.formattedDate, entrySection.entries, entrySection.averageColor)
+            }
+          }
+        }
       })
     }
     .scrollBounceBehavior(.basedOnSize)
+    .safeAreaPadding(.top)
   }
 }
 
 #Preview {
   EntryListView(
-    store: .init(initialState: EntryListFeature.State(entries: .mockModGood())) {
-      EntryListFeature()
-    }
+    store: .init(
+      initialState: EntryListFeature.State(),
+      reducer: {
+        EntryListFeature()
+      },
+      withDependencies: {
+        $0.persistentClient.fetchEntries = { _ in .mockModGood() }
+      }),
+    showExtraContentActions: .constant(false)
   )
 }
 

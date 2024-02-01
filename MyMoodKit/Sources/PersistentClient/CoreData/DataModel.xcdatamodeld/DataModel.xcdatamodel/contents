@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="23C71" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="MoodEntryObject" representedClassName="MoodEntryObject" syncable="YES">
+        <attribute name="activities" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[String]"/>
+        <attribute name="colorBlue" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="colorGreen" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="colorOpacity" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="colorRed" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="mood" attributeType="String"/>
+        <attribute name="moodScale" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="weatherEntry" optional="YES" attributeType="String"/>
+    </entity>
+</model>

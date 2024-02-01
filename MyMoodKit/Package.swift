@@ -15,6 +15,7 @@ let package = Package(
         .library(name: "Models", targets: ["Models"]),
         .library(name: "MoodEntryFeature", targets: ["MoodEntryFeature"]),
         .library(name: "NoteEntryFeature", targets: ["NoteEntryFeature"]),
+        .library(name: "PersistentClient", targets: ["PersistentClient"]),
         .library(name: "RootFeature", targets: ["RootFeature"]),
         .library(name: "Theme", targets: ["Theme"]),
         .library(name: "UIComponents", targets: ["UIComponents"]),
@@ -22,7 +23,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.5.3"),
-        .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.10.0")
+        .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.10.0"),
+        .package(url: "https://github.com/tgrapperon/swift-dependencies-additions", from: "1.0.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -46,6 +48,7 @@ let package = Package(
             dependencies: [
                 "ColorGeneratorClient",
                 "FormattersClient",
+                "PersistentClient",
                 "Theme",
                 "UIComponents",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
@@ -97,6 +100,7 @@ let package = Package(
                 "LocationClient",
                 "Models",
                 "NoteEntryFeature",
+                "PersistentClient",
                 "UIComponents",
                 "WeatherClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
@@ -119,6 +123,21 @@ let package = Package(
           name: "NoteEntryFeatureTests",
           dependencies: [
             "NoteEntryFeature",
+          ]
+        ),
+        .target(
+          name: "PersistentClient",
+          dependencies: [
+            "Models",
+            .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            .product(name: "DependenciesAdditions", package: "swift-dependencies-additions")
+          ]
+//          resources: [.process("DataModel.xcdatamodeld")]
+        ),
+        .testTarget(
+          name: "PersistentClientTests",
+          dependencies: [
+            "PersistentClient",
           ]
         ),
         .target(

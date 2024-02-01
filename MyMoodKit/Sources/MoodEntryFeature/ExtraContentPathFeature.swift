@@ -176,8 +176,8 @@ public struct ExtraContentPathFeature: Reducer {
           return
         }
         let currentWeather = try await weatherClient.weather(
-          latitude: currentLocation.latitude,
-          longitude: currentLocation.longitude
+          currentLocation.latitude,
+          currentLocation.longitude
         )
         await send(.weatherStatus(.result(currentWeather)), animation: .snappy)
       } catch let error {

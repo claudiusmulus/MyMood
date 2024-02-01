@@ -14,7 +14,6 @@ public enum DateContext {
   case monthSelector
 }
 
-@DependencyClient
 public struct FormattersClient {
-  public var formatDate: (_ date: Date, _ context: DateContext) -> String = { _, _ in "" }
+  public var formatDate: (_ context: DateContext) -> (_ date: Date) -> String
 }

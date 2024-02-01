@@ -12,6 +12,15 @@ public enum Entry: Equatable {
     case mood(MoodEntry)
 }
 
+extension Entry {
+  public var date: Date {
+    switch self {
+      case let .mood(moodEntry):
+        return moodEntry.date
+    }
+  }
+}
+
 extension Entry: Identifiable {
     public typealias Id = Tagged<Self, UUID>
     

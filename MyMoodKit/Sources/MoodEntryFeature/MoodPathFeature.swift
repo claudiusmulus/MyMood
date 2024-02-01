@@ -32,7 +32,7 @@ public struct MoodPathFeature: Reducer {
             .onChange(of: \.moodScale) { oldValue, newValue in
                 Reduce { state, _ in
                     @Dependency(\.colorGenerator) var colorGenerator
-                    let resolvedColor = colorGenerator.generatedColor(amount: Float(newValue))
+                    let resolvedColor = colorGenerator.generatedColor(Float(newValue))
                     
                     if let newMood = mood(scale: newValue) {
                         state.mood = newMood

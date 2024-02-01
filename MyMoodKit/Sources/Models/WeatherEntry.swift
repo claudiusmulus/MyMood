@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum WeatherEntry: String, CaseIterable, Codable, Equatable {
+public enum WeatherEntry: String, CaseIterable, Codable, Equatable, RawRepresentable {
     case sunny
     case cloudy
     case overcast

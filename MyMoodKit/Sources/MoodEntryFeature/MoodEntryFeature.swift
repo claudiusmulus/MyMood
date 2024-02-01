@@ -11,6 +11,7 @@ import Models
 import ColorGeneratorClient
 import FormattersClient
 import UIComponents
+import PersistentClient
 import NoteEntryFeature
 
 @Reducer
@@ -48,7 +49,7 @@ public struct MoodEntryFeature: Reducer {
       )
       
       self.extraContentPath = ExtraContentPathFeature.State(
-        notes: moodEntry.observations,
+        notes: moodEntry.observations ?? "",
         weatherEntry: moodEntry.weatherEntry
       )
     }
@@ -119,6 +120,7 @@ public struct MoodEntryFeature: Reducer {
   }
   
   @Dependency(\.dismiss) var dismiss
+  @Dependency(\.persistentClient) var persistentClient
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -158,9 +160,17 @@ public struct MoodEntryFeature: Reducer {
           return .none
                     
         case .createMoodEntryButtonTapped:
-          return .run { [state = state] send in
-            await send(.delegate(.saveMoodEntry(state.moodEntry)))
-            await self.dismiss()
+          return .run { [moodEntry = state.moodEntry] send in
+            
+            do {
+              try self.persistentClient.addMoodEntry(moodEntry)
+              await send(.delegate(.saveMoodEntry(moodEntry)))
+              await self.dismiss()
+            } catch {
+              // Handle error
+              
+            }
+
           }
           
         case .closeMoodEntryButtonTapped:
@@ -197,7 +207,7 @@ public struct MoodEntryFeature: Reducer {
             case let .updateWeatherEntry(weatherEntry):
               state.moodEntry.weatherEntry = weatherEntry
             case .displayNotes:
-              state.notes = NoteEntryFeature.State(notes: state.moodEntry.observations)
+              state.notes = NoteEntryFeature.State(notes: state.moodEntry.observations ?? "")
           }
           return .none
         case .extraContentPath:
@@ -304,7 +314,7 @@ struct MoodEntryNavigationView<DestinationContent: View>: View {
     
     private func formatDate(_ date: Date) -> String {
       @Dependency(\.formatters.formatDate) var formatDate
-      return formatDate(date, .datePicker)
+      return formatDate(.datePicker)(date)
     }
   }
   
