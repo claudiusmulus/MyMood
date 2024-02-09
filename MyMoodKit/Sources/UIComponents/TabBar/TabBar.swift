@@ -58,7 +58,7 @@ public struct CustomTabView<TabContent: View>: View {
     selection: Binding<Tab>,
     firstAction: MenuAction,
     secondAction: MenuAction,
-    onMenuAction: @escaping () -> Void,
+    onMenuAction: @escaping () -> Void = {},
     onPrimaryAction: @escaping () -> Void,
     onSecondaryAction: @escaping () -> Void,
     @ViewBuilder content: @escaping (Tab) -> TabContent

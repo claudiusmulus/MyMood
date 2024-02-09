@@ -53,11 +53,10 @@ public struct ExtraContentPathFeature: Reducer {
     case binding(BindingAction<State>)
     case delegate(Delegate)
     case onAppear
-    case fetchCurrentWeather
+    case fetchCurrentWeatherButtonTapped
     case goToSettingsButtonTapped
     case weatherDisplay(State.WeatherDisplay)
     case weatherStatus(State.WeatherStatus)
-    
     case showNotesButtonTapped
     
     public enum Delegate: Equatable {
@@ -95,8 +94,8 @@ public struct ExtraContentPathFeature: Reducer {
           return .none
         case .delegate:
           return .none
-        case .fetchCurrentWeather:
-          guard state.weatherStatus == .loading else {
+        case .fetchCurrentWeatherButtonTapped:
+          guard state.weatherStatus != .loading else {
             return .none
           }
           
@@ -217,60 +216,6 @@ struct ExtraContentPathView: View {
   var body: some View {
     WithViewStore(self.store, observe: ViewState.init) { viewStore in
       let _ = Self._printChanges()
-        //            ZStack(alignment: .top) {
-        //                if !onShowObservations {
-        //                    VStack {
-        //                        Section {
-        //                            WeatherPathView(store: self.store)
-        //                        }
-        //                        .padding(.top, 40)
-        //                        .padding(.horizontal)
-        //
-        //                        Section {
-        //                            VStack {
-        //                                HStack {
-        //                                    Text("Notes and thoughts")
-        //                                        .matchedGeometryEffect(id: "title", in: namespace)
-        //                                }
-        //                                .frame(maxWidth: .infinity, alignment: .leading)
-        //                                .padding(.horizontal)
-        //
-        //                                Text(viewStore.observations.isEmpty ? "Tap to add extra notes and thoughts" : viewStore.observations.trimmingCharacters(in: .whitespacesAndNewlines))
-        //                                    .frame(maxWidth: .infinity, alignment: .leading)
-        //                                    .lineLimit(4)
-        //                                    .foregroundStyle(viewStore.observations.isEmpty ? .black.opacity(0.3) : .black)
-        //                                    .padding()
-        //                                    .contentShape(RoundedRectangle(cornerRadius: 10))
-        //                                    .overlay {
-        //                                        RoundedRectangle(cornerRadius: 10)
-        //                                            .stroke(.black, lineWidth: 2.0)
-        //                                            .matchedGeometryEffect(id: "border", in: namespace)
-        //                                    }
-        //                                    .padding(.horizontal)
-        //                                    .onTapGesture {
-        //                                        withAnimation(.snappy) {
-        //                                            self.onShowObservations = true
-        //                                        }
-        //                                    }
-        //                            }
-        //                        }
-        //                        .padding(.top, 40)
-        //                    }
-        //                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        //                    .transition(.opacity)
-        //
-        //                } else {
-        //                    ObservationsView(
-        //                        text: viewStore.$observations,
-        //                        namespace: namespace
-        //                    ) {
-        //                        withAnimation(.snappy) {
-        //                            self.onShowObservations = false
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
       VStack {
         Section {
           WeatherPathView(store: self.store)
@@ -317,92 +262,6 @@ struct ExtraContentPathView: View {
     }
   }
 }
-
-//struct ObservationsView: View {
-//  
-//  @Binding var text: String
-//  
-//  @FocusState var isTextFieldFocus: Bool
-//  
-//  @State private var isAppearing = false
-//  
-//  var namespace: Namespace.ID
-//  
-//  var onClose: () -> Void
-//  
-//  var body: some View {
-//    ScrollView {
-//      VStack {
-//        ZStack(alignment: .bottom) {
-//          HStack {
-//            Text("Notes and thoughts")
-//              .matchedGeometryEffect(id: "title", in: namespace)
-//            
-//            Spacer()
-//          }
-//          .frame(maxWidth: .infinity, alignment: .leading)
-//          .padding([.horizontal])
-//          
-//          HStack {
-//            Button(
-//              action: {
-//                self.isTextFieldFocus = false
-//                self.onClose()
-//              },
-//              label: {
-//                Image(systemName: "checkmark")
-//                  .font(.title2)
-//                  .foregroundStyle(.black)
-//                  .padding()
-//                  .background(
-//                    RoundedRectangle(cornerRadius: 10)
-//                      .stroke(.black, lineWidth: 2.0)
-//                  )
-//                  .padding(.horizontal)
-//                  .opacity(isAppearing ? 1 : 0)
-//                  .offset(x: isAppearing ? 0 : 50)
-//                
-//              }
-//            )
-//            .scaledButton()
-//            .padding(.top, 1)
-//          }
-//          .frame(maxWidth: .infinity, alignment: .trailing)
-//        }
-//        
-//        VStack() {
-//          TextEditor(text: $text)
-//            .scrollContentBackground(.hidden)
-//            .padding(20)
-//            .foregroundStyle(.black)
-//            .tint(.black)
-//            .frame(height: 400, alignment: .top)
-//            .frame(maxWidth: .infinity)
-//            .focused(self.$isTextFieldFocus)
-//            .overlay {
-//              RoundedRectangle(cornerRadius: 10)
-//                .stroke(.black, lineWidth: 2.0)
-//                .matchedGeometryEffect(id: "border", in: namespace)
-//            }
-//            .padding(.horizontal)
-//        }
-//        .padding(.bottom, 100)
-//      }
-//    }
-//    .scrollBounceBehavior(.basedOnSize)
-//    .onAppear {
-//      withAnimation(.snappy) {
-//        self.isTextFieldFocus = true
-//        isAppearing = true
-//      }
-//    }
-//    .onDisappear {
-//      withAnimation(.snappy) {
-//        self.isTextFieldFocus = false
-//      }
-//    }
-//  }
-//}
 
 #Preview("Weather when location not determined") {
   @Namespace var namespace

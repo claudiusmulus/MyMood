@@ -39,7 +39,7 @@ struct WeatherWhenLocationNotDeterminedView: View {
                         actionTitle: self.buttonLabel(weatherStatus: viewStore.weatherStatus),
                         actionBackgroundColor: .black,
                         action: {
-                            viewStore.send(.fetchCurrentWeather, animation: .snappy)
+                            viewStore.send(.fetchCurrentWeatherButtonTapped, animation: .snappy)
                         },
                         redactedCondition: viewStore.weatherStatus == .loading
                     )

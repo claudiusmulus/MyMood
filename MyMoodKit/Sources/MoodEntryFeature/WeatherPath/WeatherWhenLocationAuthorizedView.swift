@@ -32,7 +32,7 @@ struct WeatherWhenLocationAuthorizedView: View {
             actionTitle: "Retry",
             actionBackgroundColor: .black,
             action: {
-              viewStore.send(.fetchCurrentWeather, animation: .snappy)
+              viewStore.send(.fetchCurrentWeatherButtonTapped, animation: .snappy)
             },
             redactedCondition: false
           )

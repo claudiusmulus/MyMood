@@ -17,9 +17,15 @@ extension PersistentClient: DependencyKey {
   
   public static var testValue: PersistentClient {
     PersistentClient(
+      fetchDailyEntries: { _, _ in
+        unimplemented("PersistentClient.fetchDailyEntries")
+      },
+      fetchWeeklyEntries: { _, _, _ in
+        unimplemented("PersistentClient.fetchWeeklyEntries")
+      },
       fetchEntries: { _ in
         unimplemented("PersistentClient.fetchEntries")
-      }, 
+      },
       addMoodEntry: { _ in
         unimplemented("PersistentClient.addMoodEntry")
       }
@@ -34,6 +40,8 @@ extension PersistentClient {
     let coreDataPersistentClient = CoreDataPersistentClient(persistentContainer: PersistentContainer(bundle: .module))
     
     return PersistentClient(
+      fetchDailyEntries: coreDataPersistentClient.fetchDailyEntries,
+      fetchWeeklyEntries: coreDataPersistentClient.fetchWeeklyEntries,
       fetchEntries: coreDataPersistentClient.fetchEntries(by:),
       addMoodEntry: coreDataPersistentClient.addMoodEntry
     )

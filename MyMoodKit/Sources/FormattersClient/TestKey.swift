@@ -17,6 +17,7 @@ extension DependencyValues {
 extension FormattersClient: DependencyKey {
   
   public static var testValue: FormattersClient = .init(
-    formatDate: unimplemented("FormattersClient.formatDate")
+    formatDate: unimplemented("FormattersClient.formatDate"), 
+    generateDate: unimplemented("FormattersClient.generateDate")
   )
 }

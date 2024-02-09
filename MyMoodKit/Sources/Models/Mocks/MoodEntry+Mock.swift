@@ -40,7 +40,7 @@ extension MoodEntry {
       mood: .good,
       activities: [.family, .exercise, .traveling],
       quickNote: "Quick note title",
-      observations: "note title",
+      observations: nil,
       weatherEntry: .cloudy
     )
   }
@@ -50,13 +50,13 @@ extension MoodEntry {
     @Dependency(\.date.now) var now
     return .init(
       id: .init(uuid()),
-      date: now.advanced(by: -86_400),
+      date: now.advanced(by: -(86_400 * 2)),
       colorCode: .init(red: 0.59, green: 0.83, blue: 0.36, opacity: 1),
       moodScale: 1,
       mood: .awesome,
       activities: [.family, .exercise, .traveling],
       quickNote: "Quick note title",
-      observations: "note title",
+      observations: nil,
       weatherEntry: .cloudy
     )
   }
@@ -88,6 +88,38 @@ extension MoodEntry {
       quickNote: "Regular day",
       observations: "Regular day, gray and cloudy. Too cold to go outside",
       weatherEntry: .overcast
+    )
+  }
+  
+  public static func noWeather() -> MoodEntry {
+    @Dependency(\.uuid) var uuid
+    @Dependency(\.date.now) var now
+    return .init(
+      id: .init(uuid()),
+      date: now,
+      colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
+      moodScale: 0.5,
+      mood: .okay,
+      activities: [.work, .health],
+      quickNote: "Regular day",
+      observations: "Regular day, gray and cloudy. Too cold to go outside",
+      weatherEntry: nil
+    )
+  }
+  
+  public static func onlyMood() -> MoodEntry {
+    @Dependency(\.uuid) var uuid
+    @Dependency(\.date.now) var now
+    return .init(
+      id: .init(uuid()),
+      date: now,
+      colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
+      moodScale: 0.5,
+      mood: .okay,
+      activities: [],
+      quickNote: "Regular day",
+      observations: nil,
+      weatherEntry: nil
     )
   }
 }

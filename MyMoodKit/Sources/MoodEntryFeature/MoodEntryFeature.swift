@@ -111,7 +111,6 @@ public struct MoodEntryFeature: Reducer {
     case createMoodEntryButtonTapped
     case closeMoodEntryButtonTapped
     
-    
     case notes(PresentationAction<NoteEntryFeature.Action>)
     
     public enum Delegate: Equatable {

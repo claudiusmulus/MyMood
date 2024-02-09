@@ -30,10 +30,11 @@ public struct HSegmentedControl<Item: SegmentedItem>: View {
     HStack(spacing: 0) {
       ForEach(items) { item in
         HStack(spacing: 10) {
-          Image(systemName: item.iconSystemName)
+          //Image(systemName: item.iconSystemName)
           
           Text(item.title)
-            .font(.callout)
+            .font(.title3)
+            .fontWeight(.medium)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 10)
@@ -51,6 +52,7 @@ public struct HSegmentedControl<Item: SegmentedItem>: View {
       GeometryReader {
         let size = $0.size
         let capsuleWidth = size.width / CGFloat(items.count)
+        
         Capsule()
           .fill(.black)
           .frame(width: capsuleWidth)

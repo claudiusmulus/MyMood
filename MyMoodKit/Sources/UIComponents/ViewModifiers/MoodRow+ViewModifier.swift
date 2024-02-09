@@ -20,13 +20,15 @@ struct MoodSingleRow: ViewModifier {
   
   func body(content: Content) -> some View {
     
-    HStack(spacing: 0) {
-      Rectangle()
+    HStack(alignment: .top, spacing: 0) {
+      RoundedRectangle(cornerRadius: self.accentWidth * 0.25)
         .fill(self.accentColor)
-        .frame(width: self.accentWidth)
+        .frame(width: self.accentWidth, height: self.accentWidth)
+        .padding(.trailing, 10)
       
       content
     }
+    .padding()    
     .frame(maxWidth: .infinity, alignment: .leading)
     .mask(RoundedRectangle(cornerRadius: cornerRadius))
     .background {
@@ -36,6 +38,29 @@ struct MoodSingleRow: ViewModifier {
     }
   }
 }
+
+struct MoodAverageRow: ViewModifier {
+  
+  let backgroundColor: Color
+  let cornerRadius: CGFloat
+  let shadowColor: Color
+  let shadowRadius: CGFloat
+  let shadowXOffset: CGFloat
+  let shadowYOffset: CGFloat
+  
+  func body(content: Content) -> some View {
+    content
+      .padding()
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .mask(RoundedRectangle(cornerRadius: cornerRadius))
+      .background {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+          .fill(self.backgroundColor)
+          .shadow(color: shadowColor, radius: shadowRadius, x: shadowXOffset, y: shadowYOffset)
+      }
+  }
+}
+
 
 struct MoodSectionRow: ViewModifier {
   
@@ -83,7 +108,7 @@ struct MoodSectionModifier: ViewModifier {
 extension View {
   public func moodSingleRow(
     accentColor: Color,
-    accentWidth: CGFloat = 50.0,
+    accentWidth: CGFloat = 30.0,
     backgroundColor: Color,
     cornerRadius: CGFloat = 20,
     shadowColor: Color = .black.opacity(0.2),
@@ -133,6 +158,26 @@ extension View {
         accentColor: accentColor,
         backgroundColor: backgroundColor,
         dividerColor: dividerColor
+      )
+    )
+  }
+  
+  public func moodAverage(
+    backgroundColor: Color,
+    cornerRadius: CGFloat = 20,
+    shadowColor: Color = .black.opacity(0.2),
+    shadowRadius: CGFloat = 2,
+    shadowXOffset: CGFloat = 0,
+    shadowYOffset: CGFloat = 2
+  ) -> some View {
+    self.modifier(
+      MoodAverageRow(
+        backgroundColor: backgroundColor,
+        cornerRadius: cornerRadius,
+        shadowColor: shadowColor,
+        shadowRadius: shadowRadius,
+        shadowXOffset: shadowXOffset,
+        shadowYOffset: shadowYOffset
       )
     )
   }

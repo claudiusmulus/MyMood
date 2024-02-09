@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Models
 
 extension DependencyValues {
   public var persistentClient: PersistentClient {
@@ -17,6 +18,18 @@ extension DependencyValues {
 extension PersistentClient {
   static public var previewValue: PersistentClient {
     PersistentClient(
+      fetchDailyEntries: { _, _ in
+        return AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> { continuation in
+          continuation.yield(.mockMood())
+          continuation.finish()
+        }
+      },
+      fetchWeeklyEntries: { _, _, _ in
+        return AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> { continuation in
+          continuation.yield(.mockMood())
+          continuation.finish()
+        }
+      },
       fetchEntries: { _ in .mockModGood() },
       addMoodEntry: { _ in }
     )

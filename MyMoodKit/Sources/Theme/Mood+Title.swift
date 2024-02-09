@@ -15,7 +15,7 @@ extension Mood {
         case .good:
             return "Good"
         case .okay:
-            return "Okaish"
+            return "Okay"
         case .bad:
             return "Kind of bad"
         case .terrible:

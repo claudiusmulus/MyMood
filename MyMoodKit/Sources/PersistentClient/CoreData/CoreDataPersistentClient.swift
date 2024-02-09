@@ -13,14 +13,176 @@ import CoreData
 import SwiftUI
 import Tagged
 
+enum CoreDataError: Error {
+  case notAvailable
+}
 
 final class CoreDataPersistentClient {
 
   let persistentContainer: PersistentContainer
+  
+  private(set) var fetchedDailyEntriesResultController: NSFetchedResultsController<MoodEntryObject>?
+  private(set) var fetchedWeeklyEntriesResultController: NSFetchedResultsController<MoodEntryObject>?
 
   init(persistentContainer: PersistentContainer) {
     self.persistentContainer = persistentContainer
   }
+  
+  func fetchDailyEntries(date: Date, calendar: Calendar) -> AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> {
+    fetchEntries(
+      ofFilterRequest: {
+        $0.predicate = NSPredicate(
+          format: "%K >= %@",
+          #keyPath(MoodEntryObject.date),
+          calendar.startOfDay(for: date) as CVarArg
+        )
+      }, 
+      onStoreFetcher: { [weak self] fetcher in
+        guard let strongSelf = self else {
+          return
+        }
+        strongSelf.fetchedDailyEntriesResultController = fetcher
+      },
+      onTermination: { [weak self] in
+        guard let strongSelf = self else {
+          return
+        }
+        strongSelf.fetchedDailyEntriesResultController = nil
+        
+      }
+    )
+  }
+  
+  func fetchWeeklyEntries(from fromDate: Date, to toDate: Date, calendar: Calendar) -> AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> {
+    fetchEntries(
+      ofFilterRequest: {
+        $0.predicate = NSPredicate(
+          format: "%K >= %@ AND %K <= %@",
+          #keyPath(MoodEntryObject.date),
+          calendar.startOfDay(for: fromDate) as CVarArg,
+          #keyPath(MoodEntryObject.date),
+          calendar.startOfDay(for: toDate) as CVarArg
+        )
+      },
+      onStoreFetcher: { [weak self] fetcher in
+        guard let strongSelf = self else {
+          return
+        }
+        strongSelf.fetchedWeeklyEntriesResultController = fetcher
+      },
+      onTermination: { [weak self] in
+        guard let strongSelf = self else {
+          return
+        }
+        strongSelf.fetchedWeeklyEntriesResultController = nil
+        
+      }
+    )
+  }
+  
+  private func fetchEntries(
+    ofFilterRequest: (NSFetchRequest<MoodEntryObject>) -> Void,
+    onStoreFetcher: (NSFetchedResultsController<MoodEntryObject>) -> Void,
+    onTermination: @escaping () -> Void
+  ) -> AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> {
+    let stream = AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> { [weak self] continuation in
+      guard let strongSelf = self else {
+        continuation.finish(throwing: CoreDataError.notAvailable)
+        return
+      }
+      let request = MoodEntryObject.fetchRequest()
+      request.sortDescriptors = [NSSortDescriptor(keyPath: \MoodEntryObject.date, ascending: false)]
+      
+      ofFilterRequest(request)
+      
+      let fetchedResultController = NSFetchedResultsController<MoodEntryObject>(
+        fetchRequest: request,
+        managedObjectContext: strongSelf.persistentContainer.viewContext,
+        sectionNameKeyPath: nil,
+        cacheName: nil
+      )
+      
+      onStoreFetcher(fetchedResultController)
+      
+      let delegate = MoodEntryObjectRequestDelegate(continuation: continuation)
+      
+      fetchedResultController.delegate = delegate
+      
+      continuation.onTermination = { _ in
+        onTermination()
+        _ = delegate
+      }
+      
+      do {
+        try fetchedResultController.performFetch()
+        let moodEntryObjects = fetchedResultController.fetchedObjects ?? []
+        let entries: [Entry] = moodEntryObjects.map {
+          .mood(MoodEntry(object: $0))
+        }
+        continuation.yield(IdentifiedArray(uniqueElements: entries))
+      } catch {
+        continuation.finish(throwing: error)
+      }
+      
+    }
+    
+    return stream
+  }
+  
+//  func fetchEntries(context: EntryContext) -> AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> {
+//    let stream = AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> { [weak self] continuation in
+//      guard let strongSelf = self else {
+//        continuation.finish(throwing: CoreDataError.notAvailable)
+//        return
+//      }
+//      let request = MoodEntryObject.fetchRequest()
+//      request.sortDescriptors = [NSSortDescriptor(keyPath: \MoodEntryObject.date, ascending: false)]
+//      
+//      switch context {
+//        case .all:
+//          break
+//        case let .date(date, calendar):
+//          request.predicate = NSPredicate(
+//            format: "%K >= %@",
+//            #keyPath(MoodEntryObject.date),
+//            calendar.startOfDay(for: date) as CVarArg
+//          )
+//        case let .range(from, to, calendar):
+//          request.predicate = NSPredicate(
+//            format: "%K >= %@ AND %K <= %@",
+//            #keyPath(MoodEntryObject.date),
+//            calendar.startOfDay(for: from) as CVarArg,
+//            #keyPath(MoodEntryObject.date),
+//            calendar.startOfDay(for: to) as CVarArg
+//          )
+//      }
+//      
+//      let fetchedResultController = NSFetchedResultsController<MoodEntryObject>(fetchRequest: request, managedObjectContext: strongSelf.persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+//      strongSelf.fetchedResultController = fetchedResultController
+//      let delegate = MoodEntryObjectRequestDelegate(continuation: continuation)
+//      
+//      fetchedResultController.delegate = delegate
+//      
+//      continuation.onTermination = { _ in
+//        strongSelf.fetchedResultController = nil
+//        _ = delegate
+//      }
+//      
+//      do {
+//        try fetchedResultController.performFetch()
+//        let moodEntryObjects = fetchedResultController.fetchedObjects ?? []
+//        let entries: [Entry] = moodEntryObjects.map {
+//          .mood(MoodEntry(object: $0))
+//        }
+//        continuation.yield(IdentifiedArray(uniqueElements: entries))
+//      } catch {
+//        continuation.finish(throwing: error)
+//      }
+//
+//    }
+//    
+//    return stream
+//  }
   
   func fetchEntries(by date: Date?) throws -> IdentifiedArrayOf<Entry> {
     
@@ -73,6 +235,33 @@ final class CoreDataPersistentClient {
       // Handle error properly
     }
   }
+}
+
+private class MoodEntryObjectRequestDelegate: NSObject, NSFetchedResultsControllerDelegate {
+  let continuation: AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error>.Continuation
+  
+  init(continuation: AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error>.Continuation) {
+    self.continuation = continuation
+  }
+  
+  func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    let moodEntryObjects = controller.fetchedObjects as? [MoodEntryObject] ?? []
+    let entries: [Entry] = moodEntryObjects.map {
+      .mood(MoodEntry(object: $0))
+    }
+    self.continuation.yield(IdentifiedArray(uniqueElements: entries))
+  }
+  
+//  func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
+//    guard diff.insertions.count > 0 || diff.removals.count > 0 else {
+//      return
+//    }
+//    let moodEntryObjects = controller.fetchedObjects as? [MoodEntryObject] ?? []
+//    let entries: [Entry] = moodEntryObjects.map {
+//      .mood(MoodEntry(object: $0))
+//    }
+//    self.continuation.yield(IdentifiedArray(uniqueElements: entries))
+//  }
 }
 
 extension MoodEntry {

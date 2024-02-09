@@ -3,4 +3,54 @@
    uuid = "20B68070-E165-4080-BE44-FEA61C47826A"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B183CDB9-123E-48E4-AF49-BBB2322D78F4"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../MyMoodKit/Sources/EntryListFeature/EntryListFeature.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "155"
+            endingLineNumber = "155"
+            landmarkName = "body"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "B183CDB9-123E-48E4-AF49-BBB2322D78F4 - 52ec8d142fe9ef86"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (inout EntryListFeature.EntryListFeature.State, EntryListFeature.EntryListFeature.Action) -&gt; ComposableArchitecture.Effect&lt;EntryListFeature.EntryListFeature.Action&gt; in EntryListFeature.EntryListFeature.body.getter : some"
+                  moduleName = "MyMood"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alberto/Development/PersonalProjects/MyMood/MyMoodKit/Sources/EntryListFeature/EntryListFeature.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "155"
+                  endingLineNumber = "155"
+                  offsetFromSymbolStart = "1616">
+               </Location>
+               <Location
+                  uuid = "B183CDB9-123E-48E4-AF49-BBB2322D78F4 - 52ec8d142fe9ef86"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (inout EntryListFeature.EntryListFeature.State, EntryListFeature.EntryListFeature.Action) -&gt; ComposableArchitecture.Effect&lt;EntryListFeature.EntryListFeature.Action&gt; in EntryListFeature.EntryListFeature.body.getter : some"
+                  moduleName = "MyMood"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alberto/Development/PersonalProjects/MyMood/MyMoodKit/Sources/EntryListFeature/EntryListFeature.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "155"
+                  endingLineNumber = "155"
+                  offsetFromSymbolStart = "1604">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

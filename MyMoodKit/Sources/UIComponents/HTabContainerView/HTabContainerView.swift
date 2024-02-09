@@ -69,3 +69,20 @@ public struct HTabContainerView<TabItem: SegmentedItem, Content: View>: View {
   }
 }
 
+#Preview {
+  HTabContainerView(
+    tabItems: TestItem.allCases,
+    selectedTab: .constant(.tab1)) {
+      switch $0 {
+        case .tab1:
+          Text("Tab1")
+        case .tab2:
+          Text("Tab2")
+        case .tab3:
+          Text("Tab3")
+      }
+    } shouldHideActionContent: {
+      false
+    }
+
+}
