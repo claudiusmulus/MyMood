@@ -13,20 +13,6 @@ import ComposableArchitecture
 
 struct ContentView: View {
     var body: some View {
-//        MoodEntryRootView(
-//            store: Store(
-//                initialState: MoodEntryFeature.State(
-//                    moodEntry: .mockMeh()
-//                ),
-//                reducer : {
-//                    MoodEntryFeature()
-//                },
-//                withDependencies: { dependecyValues in
-//                    dependecyValues.locationClient = .mockDenied
-//                    dependecyValues.weatherClient = .mock(.cloudy, delay: 1.0)
-//                }
-//            )
-//        )
         RootView(
             store: Store<RootFeature.State, RootFeature.Action>(
                 initialState: RootFeature.State(entryList: EntryListRouteFeature.State())
