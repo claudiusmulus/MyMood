@@ -40,7 +40,7 @@ public struct CustomSlider: View {
                     .background {
                         RoundedRectangle(cornerRadius: 10).fill(.black).shadow(color: .black.opacity(0.6), radius: 8)
                     }
-                    .offset(x: self.$value.wrappedValue.map(from: self.range, to: self.leadingOffset...(width - self.knobSize.width - self.trailingOffset)))
+                    .offset(x: width > 0 ? self.$value.wrappedValue.map(from: self.range, to: self.leadingOffset...(width - self.knobSize.width - self.trailingOffset)) : 0)
                     .gesture(
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in

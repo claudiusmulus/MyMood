@@ -27,30 +27,30 @@ struct ContentView: View {
 //                }
 //            )
 //        )
-//        RootView(
-//            store: Store<RootFeature.State, RootFeature.Action>(
-//                initialState: RootFeature.State(entryList: EntryListFeature.State())
-//            ) {
-//                RootFeature()
-//            }
-//        )
-      RootView(
-        store: Store<RootFeature.State, RootFeature.Action>(
-          initialState: RootFeature.State(
-            entryList: EntryListRouteFeature.State()
-          ),
-          reducer: {
-            RootFeature()
-          },
-          withDependencies: { dependecyValues in
-            dependecyValues.locationClient = .mockNotDetermined
-            dependecyValues.weatherClient = .mock(.sunny, delay: 1.0)
-//            dependecyValues.persistentClient.fetchEntries = { _ in
-//              [.mood(.mockAwesome())]
-//            }
-          }
+        RootView(
+            store: Store<RootFeature.State, RootFeature.Action>(
+                initialState: RootFeature.State(entryList: EntryListRouteFeature.State())
+            ) {
+                RootFeature()
+            }
         )
-      )
+//      RootView(
+//        store: Store<RootFeature.State, RootFeature.Action>(
+//          initialState: RootFeature.State(
+//            entryList: EntryListRouteFeature.State()
+//          ),
+//          reducer: {
+//            RootFeature()
+//          },
+//          withDependencies: { dependecyValues in
+//            dependecyValues.locationClient = .mockNotDetermined
+//            dependecyValues.weatherClient = .mock(.sunny, delay: 1.0)
+////            dependecyValues.persistentClient.fetchEntries = { _ in
+////              [.mood(.mockAwesome())]
+////            }
+//          }
+//        )
+//      )
     }
 }
 
