@@ -58,7 +58,7 @@ public struct EntryListDailyFeature {
           state.shouldLoadDataOnAppear = false
           return .none
           
-        case let .result(.failure(message)):
+        case .result(.failure(_)):
           // TODO. Handle error message
           state.shouldLoadDataOnAppear = false
           return .none

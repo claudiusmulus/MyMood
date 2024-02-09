@@ -68,13 +68,6 @@ public struct RootFeature: Reducer {
         case .addMoodEntryButtonTapped:
           state.destination = .addMoodEntry(MoodEntryFeature.State(moodEntry: MoodEntry()))
           return .none
-        case let .destination(.presented(.addMoodEntry(.delegate(delegate)))):
-          switch delegate {
-            case let .saveMoodEntry(moodEntry):
-              break
-              //state.entryList.addEntry(.mood(moodEntry))
-          }
-          return .none
         case .destination:
           return .none
         case .entryList:
