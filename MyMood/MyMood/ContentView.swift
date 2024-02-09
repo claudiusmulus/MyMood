@@ -6,16 +6,37 @@
 //
 
 import SwiftUI
+import Theme
+import RootFeature
+import EntryListFeature
+import ComposableArchitecture
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        RootView(
+            store: Store<RootFeature.State, RootFeature.Action>(
+                initialState: RootFeature.State(entryList: EntryListRouteFeature.State())
+            ) {
+                RootFeature()
+            }
+        )
+//      RootView(
+//        store: Store<RootFeature.State, RootFeature.Action>(
+//          initialState: RootFeature.State(
+//            entryList: EntryListRouteFeature.State()
+//          ),
+//          reducer: {
+//            RootFeature()
+//          },
+//          withDependencies: { dependecyValues in
+//            dependecyValues.locationClient = .mockNotDetermined
+//            dependecyValues.weatherClient = .mock(.sunny, delay: 1.0)
+////            dependecyValues.persistentClient.fetchEntries = { _ in
+////              [.mood(.mockAwesome())]
+////            }
+//          }
+//        )
+//      )
     }
 }
 

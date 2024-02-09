@@ -1,0 +1,107 @@
+//
+//  SwiftUIView.swift
+//  
+//
+//  Created by Alberto Novo Garrido on 2024-01-10.
+//
+
+import SwiftUI
+import ComposableArchitecture
+import Models
+import UIComponents
+
+struct WeatherWhenLocationNotDeterminedView: View {
+    let store: StoreOf<ExtraContentPathFeature>
+    
+    struct ViewState: Equatable {
+        @BindingViewState var weatherEntry: WeatherEntry?
+        var weatherStatus: ExtraContentPathFeature.State.WeatherStatus
+        
+        init(bindingViewStore: BindingViewStore<ExtraContentPathFeature.State>) {
+            self._weatherEntry = bindingViewStore.$weatherEntry
+            self.weatherStatus = bindingViewStore.weatherStatus
+        }
+    }
+    
+    var body: some View {
+        WithViewStore(self.store, observe: ViewState.init) { viewStore in
+            switch viewStore.weatherStatus {
+            case let .result(weatherEntry):
+                WeatherEntryView(
+                    message: weatherEntry.rawValue.capitalized,
+                    iconName: weatherEntry.selectedIcon,
+                    redactedCondition: false
+                )
+            default:
+                VStack{
+                    DynamicInfoActionHStack(
+                        message: self.textMessage(weatherStatus: viewStore.weatherStatus),
+                        actionTitle: self.buttonLabel(weatherStatus: viewStore.weatherStatus),
+                        actionBackgroundColor: .black,
+                        action: {
+                            viewStore.send(.fetchCurrentWeatherButtonTapped, animation: .snappy)
+                        },
+                        redactedCondition: viewStore.weatherStatus == .loading
+                    )
+                    .padding(.horizontal)
+                    
+                    
+                    Color.black
+                        .frame(height: 1)
+                    
+                    WeatherPicker(value: viewStore.$weatherEntry)
+                        .padding(.horizontal)
+                        .unredacted()
+                }
+                .padding(.vertical)
+                .roundedBorder(borderColor: .black)
+            }
+        }
+
+    }
+    
+    private func textMessage(weatherStatus: ExtraContentPathFeature.State.WeatherStatus) -> String {
+        switch weatherStatus {
+        case .loading:
+            return .placeholder(length: 30)
+        case .error:
+            return "Oops! Something is not working right now."
+        case .none:
+            return "Automatic wheather updates?"
+        default:
+            return ""
+        }
+    }
+    
+    private func buttonLabel(weatherStatus: ExtraContentPathFeature.State.WeatherStatus) -> String {
+        switch weatherStatus {
+        case .loading:
+            return .placeholder(length: 10)
+        case .error:
+            return "Retry"
+        case .none:
+            return "Click here"
+        default:
+            return ""
+        }
+    }
+}
+
+#Preview {
+  WeatherWhenLocationNotDeterminedView(
+    store: Store(
+      initialState: ExtraContentPathFeature.State(
+        notes: "Regular day, gray and cloudy. Too cold to go outside",
+        weatherStatus: .none
+      ),
+      reducer : {
+        ExtraContentPathFeature()
+      },
+      withDependencies: { dependecyValues in
+        dependecyValues.locationClient = .mockNotDetermined
+        dependecyValues.weatherClient = .mock(.sunny, delay: 0.5)
+      }
+    )
+  )
+  .padding(.horizontal)
+}
