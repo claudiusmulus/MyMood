@@ -44,10 +44,10 @@ public struct EntryListDailyFeature {
         case .onAppear:
           return .run { send in
             do {
-              for try await entries in self.persistentClient.fetchDailyEntries(self.now, self.calendar) {
+              for try await entries in await self.persistentClient.fetchDailyEntries(self.now, self.calendar) {
                 await send(.result(.success(entries: entries)))
               }
-              
+
             } catch {
               // TODO. Handle error handling
             }
@@ -100,7 +100,7 @@ public struct EntryListDailyView: View {
               case let .mood(moodEntry):
                 MoodEntryView(
                   moodEntry: moodEntry,
-                  formattedDate: formatter.formatDate(.entryList)(moodEntry.date)
+                  formattedDate: formatter.formatDate(.entryList(.item))(moodEntry.date)
                 )
                 .moodSingleRow(
                   accentColor: Color(moodEntry.colorCode),
@@ -113,7 +113,7 @@ public struct EntryListDailyView: View {
         })
       }
       .scrollBounceBehavior(.basedOnSize)
-      .safeAreaPadding(.top)
+      .safeAreaPadding(.vertical, 10)
     }
     .task {
       if store.shouldLoadDataOnAppear {

@@ -10,13 +10,18 @@ import ComposableArchitecture
 
 public enum DateContext {
   case datePicker
-  case entryList
+  case entryList(EntryListContext)
   case monthSelector(MonthSelector)
   
   public enum MonthSelector {
     case actionButton
     case yearTitle
     case monthTitle
+  }
+  
+  public enum EntryListContext {
+    case item
+    case weeklySection
   }
 }
 

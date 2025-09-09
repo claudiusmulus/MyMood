@@ -16,9 +16,14 @@ extension MoodEntry {
   public static func mockBad() -> MoodEntry {
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
+    @Dependency(\.calendar) var calendar
+    
+    let date = now.advanced(by: 3600)
     return .init(
       id: .init(uuid()),
-      date: now.advanced(by: 3600),
+      date: date,
+      sortingDayDate: date.dailyDate(using: calendar),
+      sortingMonthDate: date.monthlyDate(using: calendar),
       colorCode: .init(red: 1, green: 0.5, blue: 0.43, opacity: 1),
       moodScale: 0.1,
       mood: .terrible,
@@ -32,9 +37,13 @@ extension MoodEntry {
   public static func mockGood() -> MoodEntry {
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
+    @Dependency(\.calendar) var calendar
+    
     return .init(
       id: .init(uuid()),
       date: now,
+      sortingDayDate: now.dailyDate(using: calendar),
+      sortingMonthDate: now.monthlyDate(using: calendar),
       colorCode: .init(red: 0.59, green: 0.83, blue: 0.36, opacity: 1),
       moodScale: 0.7,
       mood: .good,
@@ -48,9 +57,14 @@ extension MoodEntry {
   public static func mockAwesome() -> MoodEntry {
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
+    @Dependency(\.calendar) var calendar
+    
+    let date = now.advanced(by: -(86_400 * 2))
     return .init(
       id: .init(uuid()),
-      date: now.advanced(by: -(86_400 * 2)),
+      date: date,
+      sortingDayDate: date.dailyDate(using: calendar),
+      sortingMonthDate: date.monthlyDate(using: calendar),
       colorCode: .init(red: 0.59, green: 0.83, blue: 0.36, opacity: 1),
       moodScale: 1,
       mood: .awesome,
@@ -64,9 +78,13 @@ extension MoodEntry {
   public static func mockMeh() -> MoodEntry {
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
+    @Dependency(\.calendar) var calendar
+    
     return .init(
       id: .init(uuid()),
       date: now,
+      sortingDayDate: now.dailyDate(using: calendar),
+      sortingMonthDate: now.monthlyDate(using: calendar),
       colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
       moodScale: 0.5,
       mood: .okay,
@@ -78,9 +96,12 @@ extension MoodEntry {
   }
   
   public static func mock(id: Int, date: Date) -> MoodEntry {
+    @Dependency(\.calendar) var calendar
     return .init(
       id: .init(UUID(id)),
       date: date,
+      sortingDayDate: date.dailyDate(using: calendar),
+      sortingMonthDate: date.monthlyDate(using: calendar),
       colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
       moodScale: 0.5,
       mood: .okay,
@@ -94,9 +115,12 @@ extension MoodEntry {
   public static func noWeather() -> MoodEntry {
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
+    @Dependency(\.calendar) var calendar
     return .init(
       id: .init(uuid()),
       date: now,
+      sortingDayDate: now.dailyDate(using: calendar),
+      sortingMonthDate: now.monthlyDate(using: calendar),
       colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
       moodScale: 0.5,
       mood: .okay,
@@ -110,9 +134,12 @@ extension MoodEntry {
   public static func onlyMood() -> MoodEntry {
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
+    @Dependency(\.calendar) var calendar
     return .init(
       id: .init(uuid()),
       date: now,
+      sortingDayDate: now.dailyDate(using: calendar),
+      sortingMonthDate: now.monthlyDate(using: calendar),
       colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
       moodScale: 0.5,
       mood: .okay,
@@ -122,21 +149,4 @@ extension MoodEntry {
       weatherEntry: nil
     )
   }
-}
-
-extension MoodEntry {
-  public static var new: MoodEntry = {
-    @Dependency(\.uuid) var uuid
-    @Dependency(\.date.now) var now
-    return .init(
-      id: .init(uuid()),
-      date: now,
-      colorCode: .init(red: 1, green: 0.81, blue: 0.29, opacity: 1),
-      moodScale: 0.5,
-      mood: .okay,
-      activities: [],
-      quickNote: "",
-      observations: ""
-    )
-  }()
 }

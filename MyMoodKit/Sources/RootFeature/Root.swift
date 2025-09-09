@@ -21,12 +21,12 @@ public struct RootFeature: Reducer {
   
   public struct State: Equatable {
     var entryList: EntryListRouteFeature.State
-    var selectedTab: Tab
+    var selectedTab: TabItem
     @PresentationState var destination: Destination.State?
     
     public init(
       entryList: EntryListRouteFeature.State,
-      selectedTab: Tab = .entryList,
+      selectedTab: TabItem = .entryList,
       destination: Destination.State? = nil
     ) {
       self.entryList = entryList
@@ -38,7 +38,7 @@ public struct RootFeature: Reducer {
   public enum Action {
     case addMenuButtonTapped
     case entryList(EntryListRouteFeature.Action)
-    case selectedTabChanged(Tab)
+    case selectedTabChanged(TabItem)
     case destination(PresentationAction<Destination.Action>)
     case addMoodEntryButtonTapped
   }
@@ -59,6 +59,9 @@ public struct RootFeature: Reducer {
       }
     }
   }
+  
+  @Dependency(\.calendar) var calendar
+  @Dependency(\.date.now) var now
   
   public var body: some ReducerOf<Self> {
     Reduce { state, action in
@@ -120,11 +123,11 @@ public struct RootView: View {
                 action: \.entryList
               )
             )
-            .tag(Tab.entryList)
+            .tag(TabItem.entryList)
             
           case .stats:
             Text("Stats")
-              .tag(Tab.stats)
+              .tag(TabItem.stats)
               .toolbar(.hidden, for: .tabBar)
         }
       }

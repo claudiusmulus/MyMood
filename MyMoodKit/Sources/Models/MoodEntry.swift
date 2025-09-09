@@ -17,6 +17,8 @@ public struct MoodEntry: Equatable, Identifiable {
   
   public let id: Id
   public var date: Date
+  public var sortingDayDate: Date
+  public var sortingMonthDate: Date
   public var colorCode: Color.Resolved
   public var moodScale: Double
   public var mood: Mood
@@ -29,6 +31,7 @@ public struct MoodEntry: Equatable, Identifiable {
   public init() {
     @Dependency(\.uuid) var uuid
     @Dependency(\.date.now) var now
+    @Dependency(\.calendar) var calendar
     self.id = .init(uuid())
     self.date = now
     self.colorCode = .init(red: 1, green: 0.81, blue: 0.29, opacity: 1)
@@ -39,11 +42,15 @@ public struct MoodEntry: Equatable, Identifiable {
     self.observations = nil
     self.weatherEntry = nil
     self.managedObjectId = nil
+    self.sortingDayDate = now.dailyDate(using: calendar)
+    self.sortingMonthDate = now.monthlyDate(using: calendar)
   }
   
   public init(
     id: Id,
     date: Date,
+    sortingDayDate: Date,
+    sortingMonthDate: Date,
     colorCode: Color.Resolved,
     moodScale: Double,
     mood: Mood,
@@ -63,5 +70,25 @@ public struct MoodEntry: Equatable, Identifiable {
     self.observations = observations
     self.weatherEntry = weatherEntry
     self.managedObjectId = managedObjectId
+    self.sortingDayDate = sortingDayDate
+    self.sortingMonthDate = sortingMonthDate
+  }
+}
+
+extension Date {
+  public func dailyDate(using calendar: Calendar) -> Date {
+    let components = calendar.dateComponents([.day, .month, .year], from: self)
+    guard let dailyDate = calendar.date(from: components) else {
+      return self
+    }
+    return dailyDate
+  }
+  
+  public func monthlyDate(using calendar: Calendar) -> Date {
+    let components = calendar.dateComponents([.month, .year], from: self)
+    guard let monthDate = calendar.date(from: components) else {
+      return self
+    }
+    return monthDate
   }
 }

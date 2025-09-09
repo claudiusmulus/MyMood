@@ -48,17 +48,40 @@ public struct HSegmentedControl<Item: SegmentedItem>: View {
     }
     .segmentedControlMask(itemProgress: self.itemProgress)
     .foregroundStyle(self.foregroundColor)
-    .background {
+    .overlay {
       GeometryReader {
         let size = $0.size
         let capsuleWidth = size.width / CGFloat(items.count)
         
         Capsule()
-          .fill(.black)
+          .stroke(.black, lineWidth: 2.0)
           .frame(width: capsuleWidth)
           .offset(x: itemProgress * (size.width - capsuleWidth))
+//        RoundedRectangle(cornerRadius: 2)
+//          .fill(.black)
+//          .frame(width: capsuleWidth - 20, height: 4, alignment: .bottom)
+//          .offset(x: (itemProgress * (size.width - capsuleWidth)) + 10.0)
+//          .offset(y: size.height - 4)
       }
     }
+//    .background {
+//      GeometryReader {
+//        let size = $0.size
+//        let capsuleWidth = (size.width / CGFloat(items.count)) - 20
+//        
+//        
+//        
+//        RoundedRectangle(cornerRadius: 2)
+//          .fill(.black)
+//          .frame(width: capsuleWidth, height: 4, alignment: .bottom)
+//          .offset(x: (itemProgress * (size.width - capsuleWidth)) + 10.0)
+//          .offset(y: size.height - 4)
+////        Capsule()
+////          .fill(.black)
+////          .frame(width: capsuleWidth)
+////          .offset(x: itemProgress * (size.width - capsuleWidth))
+//      }
+//    }
   }
 }
 
@@ -67,7 +90,7 @@ extension View {
   @ViewBuilder
   func segmentedControlMask(itemProgress: CGFloat, itemsCount: Int = 3) -> some View {
     ZStack {
-      self.foregroundStyle(.black)
+      self.foregroundStyle(.gray)
       
       self
         .symbolVariant(.fill)
@@ -123,7 +146,8 @@ enum TestItem: String, SegmentedItem, CaseIterable {
     itemProgress: .constant(0),
     foregroundColor: .white
   )
-  .background {
-    Capsule().stroke(.black, lineWidth: 2.0)
-  }
+  .padding(.horizontal)
+//  .background {
+//    Capsule().stroke(.black, lineWidth: 2.0)
+//  }
 }

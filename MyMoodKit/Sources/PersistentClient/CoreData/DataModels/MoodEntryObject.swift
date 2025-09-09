@@ -24,4 +24,26 @@ public class MoodEntryObject: NSManagedObject, Identifiable {
   @NSManaged public var colorBlue: Float
   @NSManaged public var colorOpacity: Float
   @NSManaged public var activities: [String]?
+  
+  @NSManaged public var sortDailyDate: Date
+  @NSManaged public var sortMonthlyDate: Date
+  
+  public override func willSave() {
+    super.willSave()
+    
+    self.setupSortingDates()
+  }
+  
+  private func setupSortingDates() {
+    let calendar = Calendar(identifier: .gregorian)
+    let dayComponents = calendar.dateComponents([.day, .month, .year], from: self.date)
+    let monthComponents = calendar.dateComponents([.month, .year], from: self.date)
+    guard let dayDate = calendar.date(from: dayComponents),
+            let monthDate = calendar.date(from: monthComponents) else {
+      return
+    }
+    
+    setPrimitiveValue(dayDate, forKey: #keyPath(MoodEntryObject.sortDailyDate))
+    setPrimitiveValue(monthDate, forKey: #keyPath(MoodEntryObject.sortMonthlyDate))
+  }
 }

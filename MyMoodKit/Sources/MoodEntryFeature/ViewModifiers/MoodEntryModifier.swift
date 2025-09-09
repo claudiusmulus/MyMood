@@ -121,8 +121,7 @@ struct MoodEntryModifier<PrimaryContent: View, TrailingContent: View>: ViewModif
             DatePicker(
               "Entry Date",
               selection: self.$date,
-              in: ...currentDate,
-              displayedComponents: .date
+              in: ...currentDate
             )
             .datePickerStyle(.graphical)
             .frame(width: size.width * 0.8, height: 360)

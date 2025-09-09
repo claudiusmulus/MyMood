@@ -23,7 +23,7 @@ extension PersistentClient: DependencyKey {
       fetchWeeklyEntries: { _, _, _ in
         unimplemented("PersistentClient.fetchWeeklyEntries")
       },
-      fetchEntries: { _ in
+      fetchEntriesByMonth: {
         unimplemented("PersistentClient.fetchEntries")
       },
       addMoodEntry: { _ in
@@ -42,7 +42,7 @@ extension PersistentClient {
     return PersistentClient(
       fetchDailyEntries: coreDataPersistentClient.fetchDailyEntries,
       fetchWeeklyEntries: coreDataPersistentClient.fetchWeeklyEntries,
-      fetchEntries: coreDataPersistentClient.fetchEntries(by:),
+      fetchEntriesByMonth: coreDataPersistentClient.fetchEntriesGroupedByMonth,
       addMoodEntry: coreDataPersistentClient.addMoodEntry
     )
   }

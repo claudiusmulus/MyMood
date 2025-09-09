@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import Models
+import Foundation
 
 extension DependencyValues {
   public var persistentClient: PersistentClient {
@@ -25,12 +26,17 @@ extension PersistentClient {
         }
       },
       fetchWeeklyEntries: { _, _, _ in
-        return AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error> { continuation in
-          continuation.yield(.mockMood())
+        return AsyncThrowingStream<[Date: IdentifiedArrayOf<Entry>], Error> { continuation in
+          continuation.yield([Date(timeIntervalSince1970: 1_234_567_890): .mockMood()])
           continuation.finish()
         }
       },
-      fetchEntries: { _ in .mockModGood() },
+      fetchEntriesByMonth: {
+        return AsyncThrowingStream<[Date: IdentifiedArrayOf<Entry>], Error> { continuation in
+          continuation.yield([Date(timeIntervalSince1970: 1_234_567_890): .mockMood()])
+          continuation.finish()
+        }
+      },
       addMoodEntry: { _ in }
     )
   }

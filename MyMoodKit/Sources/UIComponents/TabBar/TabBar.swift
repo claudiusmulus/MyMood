@@ -9,7 +9,7 @@ import SwiftUI
 import Theme
 import Models
 
-public enum Tab: String, CaseIterable {
+public enum TabItem: String, CaseIterable {
   case entryList = "Entries"
   case stats = "Stats"
   
@@ -27,8 +27,8 @@ struct TabBarItem: View {
   
   let activeColor: Color
   let inactiveColor: Color
-  let tab: Tab
-  @Binding var activeTab: Tab
+  let tab: TabItem
+  @Binding var activeTab: TabItem
   
   var body: some View {
     Image(systemName: tab.systemIcon)
@@ -44,7 +44,7 @@ struct TabBarItem: View {
 
 public struct CustomTabView<TabContent: View>: View {
   
-  @Binding var selection: Tab
+  @Binding var selection: TabItem
   
   let firstAction: MenuAction
   let secondAction: MenuAction
@@ -52,16 +52,16 @@ public struct CustomTabView<TabContent: View>: View {
   let onPrimaryAction: () -> Void
   let onSecondaryAction: () -> Void
   
-  let content: (Tab) -> TabContent
+  let content: (TabItem) -> TabContent
   
   public init(
-    selection: Binding<Tab>,
+    selection: Binding<TabItem>,
     firstAction: MenuAction,
     secondAction: MenuAction,
     onMenuAction: @escaping () -> Void = {},
     onPrimaryAction: @escaping () -> Void,
     onSecondaryAction: @escaping () -> Void,
-    @ViewBuilder content: @escaping (Tab) -> TabContent
+    @ViewBuilder content: @escaping (TabItem) -> TabContent
   ) {
     self._selection = selection
     self.firstAction = firstAction
@@ -75,11 +75,13 @@ public struct CustomTabView<TabContent: View>: View {
   public var body: some View {
     ZStack(alignment: .bottom) {
       Color.tabBar.ignoresSafeArea()
+
       
       VStack(spacing: 0) {
         TabView(selection: $selection) {
-          ForEach(Tab.allCases, id: \.rawValue) {
+          ForEach(TabItem.allCases, id: \.rawValue) {
             content($0)
+              .toolbar(.hidden, for: .tabBar)
           }
         }
         EmptyItem()
@@ -96,6 +98,7 @@ public struct CustomTabView<TabContent: View>: View {
         onPrimaryAction: onPrimaryAction,
         onSecondaryAction: onSecondaryAction
       )
+      .zIndex(2.0)
     }
   }
 }
@@ -104,7 +107,7 @@ struct CustomTabBar: View {
   let activeColor: Color
   let inactiveColor: Color
   let backgroundColor: Color
-  @Binding var selection: Tab
+  @Binding var selection: TabItem
   let firstAction: MenuAction
   let secondAction: MenuAction
   let onMenuAction: () -> Void
@@ -141,6 +144,7 @@ struct CustomTabBar: View {
           .background(backgroundColor)
           
           EmptyItem()
+
           
           TabBarItem(
             activeColor: activeColor,
@@ -184,11 +188,11 @@ struct EmptyItem: View {
     switch $0 {
       case .entryList:
         Text("Entry List")
-          .tag(Tab.entryList)
+          .tag(TabItem.entryList)
           .toolbar(.hidden, for: .tabBar)
       case .stats:
         Text("Stats")
-          .tag(Tab.stats)
+          .tag(TabItem.stats)
           .toolbar(.hidden, for: .tabBar)
     }
   }

@@ -65,15 +65,19 @@ struct MoodAverageRow: ViewModifier {
 struct MoodSectionRow: ViewModifier {
   
   let accentColor: Color
+  let accentWidth: CGFloat
   let backgroundColor: Color
-  let dividerColor: Color
   
   func body(content: Content) -> some View {
-    VStack(spacing: 0) {
-      dividerColor.frame(height: 1)
-        .frame(maxWidth: .infinity)
+    HStack(alignment: .top, spacing: 0) {
+      RoundedRectangle(cornerRadius: self.accentWidth * 0.25)
+        .fill(self.accentColor)
+        .frame(width: self.accentWidth, height: self.accentWidth)
+        .padding(.trailing, 10)
+      
       content
     }
+    .padding()
     .frame(maxWidth: .infinity, alignment: .leading)
     .mask(Rectangle())
     .background {
@@ -150,14 +154,14 @@ extension View {
   
   public func moodSectionRow(
     accentColor: Color,
-    backgroundColor: Color,
-    dividerColor: Color
+    accentWidth: CGFloat = 30.0,
+    backgroundColor: Color
   ) -> some View {
     self.modifier(
       MoodSectionRow(
         accentColor: accentColor,
-        backgroundColor: backgroundColor,
-        dividerColor: dividerColor
+        accentWidth: accentWidth,
+        backgroundColor: backgroundColor
       )
     )
   }

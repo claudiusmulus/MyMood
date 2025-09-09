@@ -123,6 +123,15 @@ public struct MoodEntryFeature: Reducer {
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
+      .onChange(of: \.moodEntry.date) { _, newValue in
+        Reduce { state, action in
+          @Dependency(\.calendar) var calendar
+         
+          state.moodEntry.sortingDayDate = newValue.dailyDate(using: calendar)
+          state.moodEntry.sortingMonthDate = newValue.monthlyDate(using: calendar)
+          return .none
+        }
+      }
     
     Scope(state: \.moodPath, action: \.moodPath) {
       MoodPathFeature()

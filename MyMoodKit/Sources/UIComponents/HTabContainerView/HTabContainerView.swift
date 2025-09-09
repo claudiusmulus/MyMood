@@ -31,14 +31,11 @@ public struct HTabContainerView<TabItem: SegmentedItem, Content: View>: View {
   public var body: some View {
     VStack {
       HSegmentedControl(
-        items: tabItems, 
+        items: tabItems,
         selectedItem: $selectedTab,
         itemProgress: $tabProgress,
-        foregroundColor: .white
+        foregroundColor: .black
       )
-      .background {
-        Capsule().stroke(.black, lineWidth: 2.0)
-      }
       .padding(.horizontal)
       .opacity(shouldHideActionContent() ? 0 : 1)
       .offset(y: shouldHideActionContent() ? -200 : 0)

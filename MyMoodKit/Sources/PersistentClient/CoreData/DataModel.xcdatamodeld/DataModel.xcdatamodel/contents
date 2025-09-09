@@ -10,6 +10,8 @@
         <attribute name="mood" attributeType="String"/>
         <attribute name="moodScale" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="sortDailyDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sortMonthlyDate" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="weatherEntry" optional="YES" attributeType="String"/>
     </entity>
 </model>

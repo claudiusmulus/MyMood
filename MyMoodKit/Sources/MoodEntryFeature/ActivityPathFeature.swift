@@ -84,6 +84,7 @@ struct ActivityPathView: View {
                     viewStore.send(.deselectActivity(activity.id))
                   }
                 }
+                .border(.red)
                 .scaledButton(scaleFactor: 0.85)
                 .scrollTargetLayout()
               }

@@ -21,6 +21,7 @@ public struct EntryListRouteFeature {
     var filterPath: FilterPath?
     
     var dailyEntriesFilterPath: EntryListDailyFeature.State
+    var weeklyEntriesFilterPath: EntryListWeeklyFeature.State
     
     public init(
       filterPath: FilterPath = .today,
@@ -29,11 +30,13 @@ public struct EntryListRouteFeature {
       self.filterPath = filterPath
       self.navigationPath = navigationPath
       self.dailyEntriesFilterPath = EntryListDailyFeature.State()
+      self.weeklyEntriesFilterPath = EntryListWeeklyFeature.State()
     }
   }
   
   public enum Action: BindableAction, Equatable {
     case dailyEntriesFilterPath(EntryListDailyFeature.Action)
+    case weeklyEntriesFilterPath(EntryListWeeklyFeature.Action)
     case binding(BindingAction<State>)
     case navigationPath(StackAction<NavigationPath.State, NavigationPath.Action>)
   }
@@ -87,6 +90,10 @@ public struct EntryListRouteFeature {
       EntryListDailyFeature()
     }
     
+    Scope(state: \.weeklyEntriesFilterPath, action: \.weeklyEntriesFilterPath) {
+      EntryListWeeklyFeature()
+    }
+    
     Reduce { state, action in
       switch action {
         case .binding:
@@ -96,6 +103,9 @@ public struct EntryListRouteFeature {
           return .none
           
         case .navigationPath:
+          return .none
+          
+        case .weeklyEntriesFilterPath:
           return .none
       }
     }
@@ -134,7 +144,12 @@ public struct EntryListRouteView: View {
                   )
                 )
               case .week:
-                Text("Week")
+                EntryListWeeklyFeatureView(
+                  store: self.store.scope(
+                    state: \.weeklyEntriesFilterPath,
+                    action: \.weeklyEntriesFilterPath
+                  )
+                )
               case .month:
                 Text("Month")
             }
@@ -142,6 +157,7 @@ public struct EntryListRouteView: View {
           shouldHideActionContent: { false }
         )
         .padding(.top, 10)
+        .background(Color.tabBar)
       },
       destination: { store in
         switch store.state {

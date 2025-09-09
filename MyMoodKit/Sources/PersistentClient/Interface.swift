@@ -10,9 +10,9 @@ import Models
 import Foundation
 
 public struct PersistentClient {
-  public var fetchDailyEntries: (_ date: Date, _ calendar: Calendar) -> AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error>
-  public var fetchWeeklyEntries: (_ fromDate: Date, _ toDate: Date, _ calendar: Calendar) -> AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error>
-  public var fetchEntries: (_ date: Date?) throws -> IdentifiedArrayOf<Entry>
+  public var fetchDailyEntries: (_ date: Date, _ calendar: Calendar) async -> AsyncThrowingStream<IdentifiedArrayOf<Entry>, Error>
+  public var fetchWeeklyEntries: (_ fromDate: Date, _ toDate: Date, _ calendar: Calendar) async -> AsyncThrowingStream<[Date: IdentifiedArrayOf<Entry>], Error>
+  public var fetchEntriesByMonth: () async -> AsyncThrowingStream<[Date: IdentifiedArrayOf<Entry>], Error>
   public var addMoodEntry: (MoodEntry) throws -> Void
 }
 
