@@ -10,7 +10,7 @@ import Models
 
 struct MenuActionButton: View {
   
-  @Binding var selection: Tab
+  @Binding var selection: TabItem
   let backgroundColor: Color
   let borderColor: Color
   let firstAction: MenuAction
